@@ -1,0 +1,84 @@
+<section class="demo">
+  <header>
+    <h1>Demo 2 · Checkable</h1>
+    <p class="lead">
+      Notification preferences bound via <code>buildFromHierarchy</code>. Cycle
+      through <code>CheckableSettings</code> presets to see how cascade and
+      indeterminate states change. Click a checkbox to toggle (or any row when
+      <code>checkOnClick</code> is on).
+    </p>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Preset</legend>
+        @for (p of presets; track p.key; let i = $index) {
+          <button
+            type="button"
+            [class.active]="presetIndex() === i"
+            (click)="setPreset(i)"
+          >
+            {{ p.label }}
+          </button>
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>Programmatic</legend>
+        <button type="button" (click)="checkAll()">Check all</button>
+        <button type="button" (click)="checkAllLeaves()">Check all leaves</button>
+        <button type="button" (click)="clear()">Clear</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Expand</legend>
+        <button type="button" (click)="expandAll()">Expand all</button>
+        <button type="button" (click)="collapseAll()">Collapse all</button>
+      </fieldset>
+    </div>
+
+    <p class="preset-hint">{{ presetSummary() }}</p>
+
+    <div class="stats">
+      <span>
+        <strong>Checked keys:</strong>
+        <span class="badge">{{ checkedNodes().length }}</span>
+      </span>
+      <span>
+        <strong>Leaves checked:</strong>
+        <span class="badge">{{ leafCheckedCount() }} / {{ totalLeafCount() }}</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="split">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="root()"
+        [checkable]="checkable()"
+        [checkedKeys]="checkedKeys()"
+        (checkedKeysChange)="checkedKeys.set($event)"
+      />
+    </div>
+
+    <aside class="panel">
+      <h2>Checked ({{ checkedNodes().length }})</h2>
+      @if (checkedNodes().length === 0) {
+        <p class="empty">No preferences checked yet. Click a checkbox to begin.</p>
+      } @else {
+        <ul>
+          @for (node of checkedNodes(); track node.id) {
+            <li>
+              <span
+                class="dot"
+                [class.dot-leaf]="isLeaf(node)"
+                [class.dot-group]="!isLeaf(node)"
+              ></span>
+              <span class="name">{{ node.kind === 'block' ? node.id : node.label() }}</span>
+              <span class="muted">{{ hint(node) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+  </div>
+</section>

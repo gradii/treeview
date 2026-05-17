@@ -1,0 +1,54 @@
+<section class="demo">
+  <header>
+    <h1>Demo 5 · Filter</h1>
+    <p class="lead">
+      Type to filter. Visibility is a per-node signal — invisible rows
+      collapse to <code>height = 0</code>, so the existing virtualization
+      naturally skips them with no extra branches. In <strong>lenient</strong>
+      mode, matched groups reveal their full subtree; in
+      <strong>strict</strong> mode, only matches and their ancestors stay
+      visible. Collapsed ancestors of matches auto-expand.
+    </p>
+
+    <div class="searchbar">
+      <input
+        type="search"
+        placeholder="Search packages…"
+        [value]="term()"
+        (input)="setTerm($any($event.target).value)"
+      />
+      <button type="button" class="ghost" (click)="clear()" [disabled]="term().length === 0">
+        Clear
+      </button>
+    </div>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Mode</legend>
+        @for (m of modes; track m) {
+          <button type="button" [class.active]="mode() === m" (click)="setMode(m)">{{ m }}</button>
+        }
+      </fieldset>
+      <fieldset>
+        <legend>Operator</legend>
+        @for (op of operators; track op) {
+          <button type="button" [class.active]="operator() === op" (click)="setOperator(op)">{{ op }}</button>
+        }
+      </fieldset>
+      <fieldset>
+        <legend>Case</legend>
+        <button type="button" [class.active]="ignoreCase()" (click)="toggleCase()">
+          {{ ignoreCase() ? 'ignore case' : 'case-sensitive' }}
+        </button>
+      </fieldset>
+    </div>
+  </header>
+
+  <div class="viewport">
+    <app-large-tree-view
+      [root]="root()"
+      [filter]="term()"
+      [filterSettings]="settings()"
+    />
+  </div>
+</section>

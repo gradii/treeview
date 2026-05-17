@@ -1,0 +1,60 @@
+<section class="demo">
+  <header>
+    <h1>Demo 13 · Hierarchical block tree</h1>
+    <p class="lead">
+      A single <code>CollapseNode</code> containing a large number of flat rows,
+      organized into a <strong>hierarchy of BlockNodes</strong> via
+      <code>chunkRowsRecursive</code>. Each block level is a real positioned DOM
+      container; sub-blocks are viewport-culled at every level; leaf blocks
+      render all their rows unconditionally without per-row culling.
+    </p>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Row count</legend>
+        @for (n of rowCountOptions; track n) {
+          <button
+            type="button"
+            [class.active]="rowCount() === n"
+            (click)="setRowCount(n)"
+          >
+            {{ n | number }}
+          </button>
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>Block size</legend>
+        @for (n of blockSizeOptions; track n) {
+          <button
+            type="button"
+            [class.active]="blockSize() === n"
+            (click)="setBlockSize(n)"
+          >
+            {{ n }}
+          </button>
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>Actions</legend>
+        <button type="button" (click)="expandAll()">Expand all</button>
+        <button type="button" (click)="collapseAll()">Collapse all</button>
+      </fieldset>
+    </div>
+
+    <div class="stats">
+      <span><strong>Rows:</strong> {{ rowCount() | number }}</span>
+      <span><strong>Block size:</strong> {{ blockSize() }}</span>
+      <span><strong>Block tree depth:</strong> {{ blockDepth() }} levels</span>
+      <span><strong>Total blocks:</strong> {{ totalBlocks() | number }}</span>
+    </div>
+  </header>
+
+  <div class="viewport">
+    <app-large-tree-view
+      [root]="root()"
+      [stickyHeaders]="true"
+    />
+  </div>
+</section>

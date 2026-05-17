@@ -1,0 +1,83 @@
+<section class="demo">
+  <header>
+    <h1>Demo 1 · Selection</h1>
+    <p class="lead">
+      Click a row to select it. In <strong>multiple</strong> mode,
+      <kbd>ctrl</kbd>/<kbd>cmd</kbd>+click toggles individual rows and
+      <kbd>shift</kbd>+click extends the selection from the last anchor in
+      visible tree order. Dataset: a small org chart bound via
+      <code>buildFromHierarchy</code>.
+    </p>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Mode</legend>
+        @for (m of selectionModes; track m) {
+          <button
+            type="button"
+            [class.active]="selectionMode() === m"
+            (click)="setSelectionMode(m)"
+          >
+            {{ m }}
+          </button>
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>Programmatic</legend>
+        <button type="button" (click)="selectAllPeople()">Select all people</button>
+        <button type="button" (click)="selectAllVisible()">Select all visible</button>
+        <button type="button" (click)="invertSelection()">Invert</button>
+        <button type="button" (click)="clearSelection()">Clear</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Expand</legend>
+        <button type="button" (click)="expandAll()">Expand all</button>
+        <button type="button" (click)="collapseAll()">Collapse all</button>
+      </fieldset>
+    </div>
+
+    <div class="stats">
+      <span>
+        <strong>Selected:</strong>
+        <span class="badge">{{ selectedCount() }}</span>
+      </span>
+      <span>
+        <strong>Mode:</strong> {{ selectionMode() }}
+      </span>
+    </div>
+  </header>
+
+  <div class="split">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="root()"
+        [selectionMode]="selectionMode()"
+        [selectedKeys]="selectedKeys()"
+        (selectedKeysChange)="selectedKeys.set($event)"
+      />
+    </div>
+
+    <aside class="panel">
+      <h2>Selected ({{ selectedCount() }})</h2>
+      @if (selectedNodes().length === 0) {
+        <p class="empty">Nothing selected. Click any row to begin.</p>
+      } @else {
+        <ul>
+          @for (node of selectedNodes(); track node.id) {
+            <li>
+              <span
+                class="dot"
+                [class.dot-leaf]="isLeaf(node)"
+                [class.dot-group]="!isLeaf(node)"
+              ></span>
+              <span class="name">{{ node.kind === 'block' ? node.id : node.label() }}</span>
+              <span class="muted">{{ meta(node) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+  </div>
+</section>

@@ -1,0 +1,100 @@
+<section class="demo">
+  <header>
+    <h1>Demo 12 · Nested cross-tree DnD · workspace → project → task</h1>
+    <p class="lead">
+      Three-tier homogeneous structure on each side:
+      <code>Workspace[]</code> at the root, each workspace owns
+      <code>Project[]</code>, each project owns <code>Task[]</code>. Every
+      level is draggable, and every level can be a drop target. Both trees
+      share the same accessor shape, so any node can cross between
+      <strong>Team A</strong> and <strong>Team B</strong> in a single drag.
+    </p>
+  </header>
+
+  <div class="cases">
+    <article>
+      <h3>task → task</h3>
+      <p>Sibling reorder inside a project, or move a task between projects
+        (within or across trees).</p>
+    </article>
+    <article>
+      <h3>task → project · over</h3>
+      <p>Drop a task on a project header — task lands as that project's
+        last child. Works across trees.</p>
+    </article>
+    <article>
+      <h3>project → project</h3>
+      <p>Reorder projects inside a workspace, or move a project to a
+        different workspace via before/after.</p>
+    </article>
+    <article>
+      <h3>project → workspace · over</h3>
+      <p>Drop a project on a workspace header — becomes that workspace's
+        last project. Cross-tree works too.</p>
+    </article>
+    <article>
+      <h3>workspace → workspace</h3>
+      <p>Reorder workspaces at the top level — the synthetic root's
+        <code>rootMeta</code> exposes the workspaces array for splicing.</p>
+    </article>
+    <article class="warn">
+      <h3>shape mismatch · rejected</h3>
+      <p>Drop a project on a task, or a task on a workspace header? Both
+        rejected (folders host folders, project folders host tasks).
+        Preview snaps back.</p>
+    </article>
+  </div>
+
+  <div class="grid">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="leftRoot()"
+        [allowDrag]="true"
+        [dragSourceAccessors]="accessors"
+        (nodeDropped)="onLeftDropped($event)"
+      />
+    </div>
+
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="rightRoot()"
+        [allowDrag]="true"
+        [dragSourceAccessors]="accessors"
+        (nodeDropped)="onRightDropped($event)"
+      />
+    </div>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Recent moves ({{ moves().length }})</h2>
+        @if (moves().length > 0) {
+          <button type="button" class="link" (click)="clearLog()">clear</button>
+        }
+      </div>
+      @if (moves().length === 0) {
+        <p class="empty">Drag any node. Logs show receiver + level + position.</p>
+      } @else {
+        <ol>
+          @for (m of moves(); track $index) {
+            <li>
+              <span class="recv">→ Team {{ m.receiver }}</span>
+              <span class="kind k-{{ m.kind }}">{{ m.kind }}</span>
+              <span class="tag t-{{ m.position }}">{{ m.position }}</span>
+              <div class="who">
+                <span class="name">{{ m.source }}</span>
+                <span class="arrow">→</span>
+                <span class="muted">{{ m.target }}</span>
+              </div>
+            </li>
+          }
+        </ol>
+      }
+
+      <h2>Team A</h2>
+      <pre>{{ teamA | json }}</pre>
+
+      <h2>Team B</h2>
+      <pre>{{ teamB | json }}</pre>
+    </aside>
+  </div>
+</section>

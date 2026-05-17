@@ -1,0 +1,19 @@
+<section class="demo">
+  <header>
+    <h1>Demo 6 · Lazy children</h1>
+    <p class="lead">
+      Each region is a <code>CollapseNode</code> backed by a single
+      <code>lazyBlock</code> placeholder. Collapsed by default. Expand one —
+      the block is now visible, so <code>ensureLoaded()</code> fires; you'll
+      see skeleton rows pulse for {{ '1.2s' }} (simulated latency), then real
+      rows replace them. Scroll position is stable across the load because
+      the placeholder sized itself from <code>totalChildrenCount</code> up
+      front.
+    </p>
+    <p class="hint">{{ hint() }}</p>
+  </header>
+
+  <div class="viewport">
+    <app-large-tree-view [root]="root()" />
+  </div>
+</section>

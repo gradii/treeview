@@ -1,0 +1,71 @@
+<section class="demo">
+  <header>
+    <h1>Demo 7 · Mutation + nested Blocks (source-synced)</h1>
+    <p class="lead">
+      10,000 rows built via <code>buildFromHierarchy</code> from a real
+      <code>Bucket.items[]</code> source array. Each insert/remove uses
+      <code>insertRowSibling</code> / <code>removeRowFromSource</code>: it
+      walks up the tree via <code>node.meta</code> to find the source
+      <code>Bucket</code>, splices its <code>items</code> array, <em>then</em>
+      mirrors the change into the Block tree. The two stay in sync — see the
+      <em>source items</em> count in the panel.
+    </p>
+
+    <div class="controls">
+      <label>
+        Insert at
+        <input
+          type="number"
+          min="0"
+          [value]="insertIndex()"
+          (input)="setInsertIndex($any($event.target).value)"
+        />
+      </label>
+      <button type="button" (click)="insertOne()">Insert 1 row</button>
+      <button type="button" (click)="insertBatch()">Insert 50 rows</button>
+      <button type="button" (click)="removeFirstDynamic()">Remove first dynamic</button>
+    </div>
+
+    <p class="status">{{ status() }}</p>
+  </header>
+
+  <div class="split">
+    <div class="viewport">
+      <app-large-tree-view [root]="root()" />
+    </div>
+
+    <aside class="panel">
+      <h2>Source &amp; tree</h2>
+      <dl>
+        <dt>Source items</dt>
+        <dd>{{ sourceCount().toLocaleString() }}</dd>
+
+        <dt>Tree rows</dt>
+        <dd>{{ stats().totalRows.toLocaleString() }}</dd>
+      </dl>
+
+      <h2>Block-tree stats</h2>
+      <dl>
+        <dt>Total Blocks</dt>
+        <dd>{{ stats().totalBlocks.toLocaleString() }}</dd>
+
+        <dt>Leaf Blocks</dt>
+        <dd>{{ stats().totalLeafBlocks }}</dd>
+
+        <dt>Group Blocks</dt>
+        <dd>{{ stats().totalGroupBlocks }}</dd>
+
+        <dt>Max nesting depth</dt>
+        <dd>{{ stats().maxDepth }}</dd>
+
+        <dt>Leaf size min / max</dt>
+        <dd>{{ stats().minLeafSize }} / {{ stats().maxLeafSize }}</dd>
+      </dl>
+      <p class="hint">
+        Insert 50 rows at the same index — leaf size jumps to 40, then
+        <strong>splits</strong>. Source and tree counts always match.
+      </p>
+    </aside>
+  </div>
+</section>
+

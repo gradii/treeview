@@ -1,0 +1,74 @@
+<section class="demo">
+  <header>
+    <h1>Demo 11 · Cross-tree DnD · cards across buckets</h1>
+    <p class="lead">
+      Two LargeTreeViews share the root-scoped <code>TreeDragService</code>.
+      Pointer events route to whichever tree's row or header sits under the
+      cursor, so cards can move between <strong>Backlog</strong> and
+      <strong>Current sprint</strong> — and can also be dropped on either
+      Bucket header to land at the end of that bucket. Press <kbd>Esc</kbd>
+      mid-drag to cancel — the preview glides back to its origin.
+    </p>
+
+    <div class="controls">
+      <button
+        type="button"
+        [class.active]="useHandle()"
+        (click)="toggleHandle()"
+      >
+        {{ useHandle() ? '⠿ handle required' : 'drag from anywhere' }}
+      </button>
+      <span class="hint-text">
+        Try every case: drag a card to a sibling (<code>row→row</code>),
+        across trees, onto the other Bucket's header
+        (<code>row→folder · over</code>), and tap <kbd>Esc</kbd> mid-drag.
+      </span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="leftRoot()"
+        [allowDrag]="true"
+        [dragHandle]="useHandle()"
+        [dragSourceAccessors]="accessors"
+        (nodeDropped)="onLeftDropped($event)"
+      />
+    </div>
+
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="rightRoot()"
+        [allowDrag]="true"
+        [dragHandle]="useHandle()"
+        [dragSourceAccessors]="accessors"
+        (nodeDropped)="onRightDropped($event)"
+      />
+    </div>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Move log</h2>
+        @if (moves().length > 0) {
+          <button type="button" class="link" (click)="clearLog()">clear</button>
+        }
+      </div>
+      @if (moves().length === 0) {
+        <p class="empty">Drag a card. Logs show the receiving tree.</p>
+      } @else {
+        <ol>
+          @for (m of moves(); track $index) {
+            <li>{{ m }}</li>
+          }
+        </ol>
+      }
+
+      <h2>Backlog</h2>
+      <pre>{{ backlog | json }}</pre>
+
+      <h2>Sprint</h2>
+      <pre>{{ sprint | json }}</pre>
+    </aside>
+  </div>
+</section>

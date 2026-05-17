@@ -1,0 +1,139 @@
+<div class="page">
+  <header>
+    <h1>TreeView · Stage 1–4 Combined Demo</h1>
+    <p class="lead">
+      Toggle the data source, selection mode, and checkable settings to exercise
+      Stages 1 (expand controller), 2 (binding adapters), 3 (selection), and
+      4 (tri-state checkable with cascade). Plain click toggles + selects;
+      ctrl/cmd toggles selection; shift extends selection; checkbox click
+      toggles check (cascades according to settings).
+    </p>
+
+    <div class="control-grid">
+      <fieldset>
+        <legend>Data source</legend>
+        <button
+          type="button"
+          [class.active]="source() === 'stress'"
+          (click)="setSource('stress')"
+        >
+          Stress (block-chunked)
+        </button>
+        <button
+          type="button"
+          [class.active]="source() === 'files'"
+          (click)="setSource('files')"
+        >
+          File tree (hierarchy binding)
+        </button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Selection mode</legend>
+        @for (m of selectionModes; track m) {
+          <button
+            type="button"
+            [class.active]="selectionMode() === m"
+            (click)="setSelectionMode(m)"
+          >
+            {{ m }}
+          </button>
+        }
+        <button type="button" (click)="clearSelection()">clear</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Checkable</legend>
+        @for (p of checkablePresets; track p.label; let i = $index) {
+          <button
+            type="button"
+            [class.active]="checkablePresetIndex() === i"
+            (click)="setCheckablePreset(i)"
+          >
+            {{ p.label }}
+          </button>
+        }
+        <button type="button" (click)="clearChecked()">clear</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Expand owner (Stage 1)</legend>
+        <button
+          type="button"
+          [class.active]="!useExternalExpand()"
+          (click)="setExpandOwner(false)"
+        >
+          internal (node.collapsed)
+        </button>
+        <button
+          type="button"
+          [class.active]="useExternalExpand()"
+          (click)="setExpandOwner(true)"
+        >
+          external (keyed)
+        </button>
+      </fieldset>
+    </div>
+
+    <div class="stats">
+      <span>
+        <strong>Total nodes:</strong> {{ activeRoot().nodeCount() }}
+      </span>
+      <span>
+        <strong>Selected:</strong>
+        <span class="badge">{{ selectedCount() }}</span>
+      </span>
+      <span>
+        <strong>Checked:</strong>
+        <span class="badge">{{ checkedCount() }}</span>
+      </span>
+      <span>
+        <strong>Expanded (external):</strong>
+        <span class="badge">{{ expandedCount() }}</span>
+      </span>
+      @if (source() === 'stress') {
+        <span>
+          <strong>Height:</strong> {{ activeRoot().height() }}px
+        </span>
+      }
+    </div>
+
+    <div class="actions">
+      @if (source() === 'stress') {
+        <label>
+          Depth
+          <select [value]="depth()" (change)="onDepthChange($event)">
+            @for (d of depthOptions; track d) {
+              <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </label>
+      }
+      <button type="button" (click)="expandAll()">Expand all</button>
+      <button type="button" (click)="collapseAll()">Collapse all</button>
+      <button type="button" (click)="toggleSticky()">
+        Sticky headers: {{ stickyHeaders() ? 'on' : 'off' }}
+      </button>
+      @if (source() === 'stress') {
+        <button type="button" (click)="resizeRandomRow()">
+          Resize random row
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="viewport">
+    <app-large-tree-view
+      [root]="activeRoot()"
+      [stickyHeaders]="stickyHeaders()"
+      [selectionMode]="selectionMode()"
+      [selectedKeys]="selectedKeys()"
+      (selectedKeysChange)="selectedKeys.set($event)"
+      [checkable]="checkable()"
+      [checkedKeys]="checkedKeys()"
+      (checkedKeysChange)="checkedKeys.set($event)"
+      [expandedKeys]="effectiveExpandedKeys()"
+      (expandedKeysChange)="expandedKeys.set($event)"
+    />
+  </div>
+</div>

@@ -1,0 +1,100 @@
+<section class="demo">
+  <header>
+    <h1>Demo 10 · Drag-and-drop · all positions + animations</h1>
+    <p class="lead">
+      Every row and folder header is wired to <code>cdkDrag</code>. The
+      <code>TreeDragService</code> hit-tests the cursor against the row /
+      header under the pointer and feeds the result to the shared
+      <code>DropHint</code> overlay. On release, the host calls
+      <code>moveRow</code>, <code>moveRowAsChild</code>, or
+      <code>moveCollapse</code> from <code>source-mutation.ts</code> — each
+      splices the underlying data array and the tree node in lockstep, then
+      emits <code>(nodeDropped)</code>.
+    </p>
+    <p class="hint">
+      Try every drop case below — the right panel logs each one with the
+      operation kind (<code>row→row</code>, <code>row→folder</code>,
+      <code>folder→folder</code>) and the data array updates in place.
+    </p>
+  </header>
+
+  <div class="cases">
+    <article>
+      <h3>row → row · same lane</h3>
+      <p>Drag a task above or below another task in the same lane.
+        Splices via <code>moveRow</code>.</p>
+    </article>
+    <article>
+      <h3>row → row · cross lane</h3>
+      <p>Drag a task into another lane and drop it next to a sibling task.
+        Source array of the donor lane shrinks, recipient lane grows.</p>
+    </article>
+    <article>
+      <h3>row → folder · drop on header</h3>
+      <p>Drag a task and release on a lane header — task becomes that
+        lane's last child (<code>moveRowAsChild</code>).</p>
+    </article>
+    <article>
+      <h3>folder → folder · reorder lanes</h3>
+      <p>Grab a lane's header and drop it before or after another lane.
+        The synthetic root's <code>rootMeta</code> exposes the lanes array
+        so <code>moveCollapse</code> can splice it.</p>
+    </article>
+    <article>
+      <h3>auto-scroll · drag near edge</h3>
+      <p>Drag a task toward the top or bottom of the viewport. The
+        scroller pans automatically once you enter the 48px hot-zone,
+        speeding up the closer you get to the edge.</p>
+    </article>
+    <article class="warn">
+      <h3>shape mismatch · rejected</h3>
+      <p>Dropping a task on the <em>Sprint board</em> header is rejected
+        (root contains lanes, not tasks) — preview animates back. The
+        <em>Sprint board</em> header itself isn't draggable (no parent to
+        move it into).</p>
+    </article>
+    <article class="warn">
+      <h3>escape mid-drag · cancelled</h3>
+      <p>Press <kbd>Esc</kbd> while dragging — the drop is skipped and the
+        preview snaps back to its origin.</p>
+    </article>
+  </div>
+
+  <div class="split">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="root()"
+        [allowDrag]="true"
+        [dragSourceAccessors]="accessors"
+        (nodeDropped)="onDropped($event)"
+      />
+    </div>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Recent moves ({{ totalMoves() }})</h2>
+        @if (moves().length > 0) {
+          <button type="button" class="link" (click)="clearLog()">clear</button>
+        }
+      </div>
+      @if (moves().length === 0) {
+        <p class="empty">Drag a row or folder to log a move.</p>
+      } @else {
+        <ol class="log">
+          @for (m of moves(); track $index) {
+            <li>
+              <span class="tag {{ m.position }}">{{ m.position }}</span>
+              <span class="kind">{{ m.kind }}</span>
+              <span class="name">{{ m.source }}</span>
+              <span class="arrow">→</span>
+              <span class="muted">{{ m.target }}</span>
+            </li>
+          }
+        </ol>
+      }
+
+      <h2>Source · current</h2>
+      <pre>{{ lanes | json }}</pre>
+    </aside>
+  </div>
+</section>

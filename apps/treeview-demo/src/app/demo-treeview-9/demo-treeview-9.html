@@ -1,0 +1,52 @@
+<section class="demo">
+  <header>
+    <h1>Demo 9 · Node template</h1>
+    <p class="lead">
+      A single <code>&lt;ng-template appTreeViewNodeTemplate&gt;</code> drives
+      both row and collapse-header rendering. The template gets the source
+      <code>$implicit</code> item plus reactive flags (<code>isSelected</code>,
+      <code>isChecked</code>, <code>isExpanded</code>, <code>isDisabled</code>,
+      <code>isActive</code>, <code>depth</code>). Branch on
+      <code>node.kind</code> when rows and folders need different markup.
+    </p>
+  </header>
+
+  <div class="viewport">
+    <app-large-tree-view
+      [root]="root()"
+      selectionMode="multiple"
+      [selectedKeys]="selectedKeys()"
+      (selectedKeysChange)="selectedKeys.set($event)"
+      [checkable]="true"
+      [checkedKeys]="checkedKeys()"
+      (checkedKeysChange)="checkedKeys.set($event)"
+    >
+      <ng-template
+        appTreeViewNodeTemplate
+        let-item
+        let-node="node"
+        let-isExpanded="isExpanded"
+        let-isSelected="isSelected"
+        let-isActive="isActive"
+      >
+        <span class="icon" aria-hidden="true">
+          {{ node.kind === 'collapse' && isExpanded === false ? '📂' : iconFor(item) }}
+        </span>
+        <span class="name">{{ item?.name ?? node.label() }}</span>
+        @if (node.kind === 'collapse') {
+          <span class="badge">{{ node.nodeCount() - 1 }} items</span>
+        } @else {
+          @if (item?.size; as s) {
+            <span class="muted">{{ s }}</span>
+          }
+        }
+        @if (isActive) {
+          <span class="active-dot" aria-hidden="true">●</span>
+        }
+        @if (isSelected) {
+          <span class="selected-pill">selected</span>
+        }
+      </ng-template>
+    </app-large-tree-view>
+  </div>
+</section>

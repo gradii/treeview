@@ -1,0 +1,81 @@
+<section class="demo" (keydown)="onWindowKey($event)">
+  <header>
+    <h1>Demo 4 · Keyboard navigation</h1>
+    <p class="lead">
+      Click anywhere inside the tree and try the arrow keys. The active node
+      is highlighted in blue and announced to screen readers via
+      <code>aria-activedescendant</code>. No flat-index — moves are computed
+      by walking the tree from the current node (O(depth)).
+    </p>
+
+    <ul class="cheatsheet">
+      <li><kbd>↑</kbd><kbd>↓</kbd> previous / next visible</li>
+      <li><kbd>←</kbd> collapse · or jump to parent</li>
+      <li><kbd>→</kbd> expand · or descend into first child</li>
+      <li><kbd>Home</kbd><kbd>End</kbd> first / last</li>
+      <li><kbd>Enter</kbd> select row · toggle collapse · trigger load-more</li>
+      <li><kbd>Space</kbd> toggle checkbox · trigger load-more</li>
+    </ul>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Selection</legend>
+        @for (m of selectionModes; track m) {
+          <button
+            type="button"
+            [class.active]="selectionMode() === m"
+            (click)="setMode(m)"
+          >{{ m }}
+          </button>
+        }
+      </fieldset>
+      <fieldset>
+        <legend>Check</legend>
+        <button
+          type="button"
+          [class.active]="checkable()"
+          (click)="toggleCheckable()"
+        >{{ checkable() ? 'enabled' : 'disabled' }}
+        </button>
+      </fieldset>
+    </div>
+  </header>
+
+  <div class="split">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="root()"
+        [selectionMode]="selectionMode()"
+        [selectedKeys]="selectedKeys()"
+        (selectedKeysChange)="selectedKeys.set($event)"
+        [checkable]="checkable()"
+        [checkedKeys]="checkedKeys()"
+        (checkedKeysChange)="checkedKeys.set($event)"
+      />
+    </div>
+
+    <aside class="panel">
+      <h2>Recent keys</h2>
+      @if (recentKeys().length === 0) {
+        <p class="empty">Focus the tree and start pressing keys.</p>
+      } @else {
+        <ol class="keylog">
+          @for (k of recentKeys(); track $index) {
+            <li><kbd>{{ k }}</kbd></li>
+          }
+        </ol>
+      }
+
+      <h2>Checked ({{ checkedNodes().length }})</h2>
+      @if (checkedNodes().length === 0) {
+        <p class="empty">Press <kbd>Space</kbd> on any item.</p>
+      } @else {
+        <ul class="checks">
+          @for (n of checkedNodes(); track n.id) {
+            <li>{{ labelOf(n) }}</li>
+          }
+        </ul>
+      }
+    </aside>
+  </div>
+</section>

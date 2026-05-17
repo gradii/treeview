@@ -1,0 +1,79 @@
+<section class="demo">
+  <header>
+    <h1>Demo 14 · Sticky header config &amp; drop shadow</h1>
+    <p class="lead">
+      Configures the sticky overlay's <code>marginTop / marginLeft / marginRight</code>
+      via <code>stickyConfig</code>, and exposes per-level <code>headerSize</code>
+      sliders so each sticky item can have a different height. A single drop
+      shadow is painted under the entire sticky stack using a plain CSS rule
+      on <code>.sticky-backplate</code>.
+    </p>
+
+    <div class="controls">
+      @for (i of levelIndices; track i) {
+        <fieldset>
+          <legend>L{{ i }} header — {{ levelHeights()[i] }}px</legend>
+          <input
+            type="range"
+            min="20"
+            max="80"
+            step="2"
+            [value]="levelHeights()[i]"
+            (input)="setLevelHeight(i, +$any($event.target).value)"
+          />
+        </fieldset>
+      }
+
+      <fieldset>
+        <legend>Margin top — {{ marginTop() }}px</legend>
+        <input
+          type="range"
+          min="0"
+          max="48"
+          step="2"
+          [value]="marginTop()"
+          (input)="setMarginTop(+$any($event.target).value)"
+        />
+      </fieldset>
+
+      <fieldset>
+        <legend>Margin left — {{ marginLeft() }}px</legend>
+        <input
+          type="range"
+          min="0"
+          max="64"
+          step="2"
+          [value]="marginLeft()"
+          (input)="setMarginLeft(+$any($event.target).value)"
+        />
+      </fieldset>
+
+      <fieldset>
+        <legend>Margin right — {{ marginRight() }}px</legend>
+        <input
+          type="range"
+          min="0"
+          max="64"
+          step="2"
+          [value]="marginRight()"
+          (input)="setMarginRight(+$any($event.target).value)"
+        />
+      </fieldset>
+
+      <fieldset>
+        <legend>Actions</legend>
+        <button type="button" (click)="expandAll()">Expand all</button>
+        <button type="button" (click)="collapseAll()">Collapse all</button>
+      </fieldset>
+    </div>
+  </header>
+
+  <div class="viewport">
+    <app-large-tree-view
+      class="shadowed-sticky"
+      [root]="root()"
+      [stickyHeaders]="true"
+      [stickyConfig]="stickyConfig()"
+    />
+  </div>
+</section>

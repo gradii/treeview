@@ -1,0 +1,59 @@
+<section class="demo">
+  <header>
+    <h1>Demo 3 · Load more</h1>
+    <p class="lead">
+      Two flavors of pagination. <strong>Client-side:</strong> a synthetic
+      40-org dataset where each level is sliced to <code>pageSize</code> rows
+      and a trailer reveals the next batch — no network. <strong>Remote:</strong>
+      a simulated paginated log endpoint (450ms latency) where each click of the
+      trailer fetches the next page; the trailer self-clears once exhausted.
+    </p>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <header class="card-head">
+        <h2>Client-side · <code>pageSize</code></h2>
+        <div class="controls">
+          <span class="muted">page size:</span>
+          @for (n of [5, 15, 50]; track n) {
+            <button
+              type="button"
+              [class.active]="clientPageSize() === n"
+              (click)="setClientPageSize(n)"
+            >
+              {{ n }}
+            </button>
+          }
+        </div>
+      </header>
+      <p class="hint">
+        Each group above the threshold collapses extra rows behind a trailer.
+        Click the trailer as many times as you like — the page-size knob
+        controls how many rows each click reveals.
+      </p>
+      <div class="viewport">
+        <app-large-tree-view [root]="clientRoot()" />
+      </div>
+    </section>
+
+    <section class="card">
+      <header class="card-head">
+        <h2>Remote · async fetch</h2>
+        <div class="controls">
+          <button type="button" (click)="loadAllRemote()">Drain all</button>
+          <button type="button" (click)="resetRemote()">Reset</button>
+        </div>
+      </header>
+      <p class="hint">
+        Loaded: <strong>{{ remoteLoaded() }}</strong> / 1200. Each click invokes
+        <code>loadFn({{ '{' }} skip, take {{ '}' }})</code> with 450ms latency;
+        the in-flight promise is shared so spam-clicks coalesce. Keep clicking
+        the trailer until it disappears.
+      </p>
+      <div class="viewport">
+        <app-large-tree-view [root]="remoteRoot()" />
+      </div>
+    </section>
+  </div>
+</section>

@@ -1,0 +1,103 @@
+<section class="demo">
+  <header>
+    <h1>Demo 8 · Disabled state</h1>
+    <p class="lead">
+      Nodes listed in <code>disabledKeys</code> ignore click selection and
+      check toggles. By default the state cascades to descendants — disabling
+      a folder freezes the whole subtree. Flip
+      <strong>disable parents only</strong> to make children stay interactive
+      under a disabled parent, and <strong>expand disabled nodes</strong> to
+      let users still expand/collapse a frozen folder.
+    </p>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Selection mode</legend>
+        @for (m of selectionModes; track m) {
+          <button
+            type="button"
+            [class.active]="selectionMode() === m"
+            (click)="setSelectionMode(m)"
+          >{{ m }}
+          </button>
+        }
+      </fieldset>
+
+      <fieldset>
+        <legend>Checkboxes</legend>
+        <button
+          type="button"
+          [class.active]="checkable()"
+          (click)="toggleCheckable()"
+        >{{ checkable() ? 'enabled' : 'disabled' }}
+        </button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Disable behavior</legend>
+        <button
+          type="button"
+          [class.active]="disableParentNodesOnly()"
+          (click)="toggleParentsOnly()"
+        >parents only
+        </button>
+        <button
+          type="button"
+          [class.active]="expandDisabledNodes()"
+          (click)="toggleExpandDisabled()"
+        >expand disabled
+        </button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Disabled keys</legend>
+        @for (key of ['frontend', 'iris', 'ops', 'platform', 'jay']; track key) {
+          <button
+            type="button"
+            [class.active]="isDisabled(key)"
+            (click)="toggleKey(key)"
+          >{{ key }}
+          </button>
+        }
+        <button type="button" (click)="resetDisabled()">reset</button>
+      </fieldset>
+    </div>
+  </header>
+
+  <div class="split">
+    <div class="viewport">
+      <app-large-tree-view
+        [root]="root()"
+        [selectionMode]="selectionMode()"
+        [selectedKeys]="selectedKeys()"
+        (selectedKeysChange)="selectedKeys.set($event)"
+        [checkable]="checkable()"
+        [checkedKeys]="checkedKeys()"
+        (checkedKeysChange)="checkedKeys.set($event)"
+        [disabledKeys]="disabledKeys()"
+        [disableParentNodesOnly]="disableParentNodesOnly()"
+        [expandDisabledNodes]="expandDisabledNodes()"
+      />
+    </div>
+
+    <aside class="panel">
+      <h2>Current state</h2>
+      <dl>
+        <dt>Disabled keys</dt>
+        <dd>{{ disabledKeys().size }}</dd>
+
+        <dt>Selected</dt>
+        <dd>{{ selectedKeys().size }}</dd>
+
+        <dt>Checked</dt>
+        <dd>{{ checkedKeys().size }}</dd>
+      </dl>
+      <p class="hint">
+        Try clicking a frozen row: nothing happens. Check a non-disabled
+        ancestor: cascade skips disabled descendants when
+        <code>checkChildren</code> is on. Flip <em>parents only</em>: members
+        of a frozen team become interactive again.
+      </p>
+    </aside>
+  </div>
+</section>
