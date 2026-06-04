@@ -293,6 +293,12 @@ interface StickyItem {
       transition: height var(--tv-anim-duration) var(--tv-anim-easing);
     }
 
+    /* Smooth transitions for sticky headers when they enter/exit the stack */
+    :host(.tv-animate) .sticky-stack .tv-header {
+      transition: top var(--tv-anim-duration) var(--tv-anim-easing),
+                  box-shadow var(--tv-anim-duration) var(--tv-anim-easing);
+    }
+
     .sticky-stack {
       /* Sticks at top:0 inside the scroller. height:0 + overflow:visible means
          it doesn't take flow space — the canvas below renders from y=0 — but

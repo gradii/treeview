@@ -116,6 +116,20 @@ interface PlaceholderSlot {
       box-sizing: border-box;
     }
 
+    /* Smooth fade-in for placeholders */
+    :host-context(.tv-animate) .tv-placeholder {
+      animation: tv-fade-in 300ms var(--tv-anim-easing);
+    }
+
+    @keyframes tv-fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
     .tv-placeholder.has-error {
       background: var(--tv-bg-error);
     }

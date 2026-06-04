@@ -56,7 +56,23 @@ import { TreeDragService } from './tree-drag.service';
       background: #0969da;
       box-shadow: 0 0 0 1px rgba(9, 105, 218, 0.35);
       border-radius: 1px;
+      animation: tv-drop-hint-appear 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: top 100ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                  left 100ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                  width 100ms cubic-bezier(0.2, 0.8, 0.2, 1);
     }
+
+    @keyframes tv-drop-hint-appear {
+      from {
+        opacity: 0;
+        transform: scaleX(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+
     .tv-drop-hint::before,
     .tv-drop-hint::after {
       content: '';
@@ -66,6 +82,7 @@ import { TreeDragService } from './tree-drag.service';
       height: 8px;
       border-radius: 50%;
       background: #0969da;
+      animation: tv-drop-hint-pulse 1.5s ease-in-out infinite;
     }
     .tv-drop-hint::before {
       left: -4px;
@@ -73,12 +90,38 @@ import { TreeDragService } from './tree-drag.service';
     .tv-drop-hint::after {
       right: -4px;
     }
+
+    @keyframes tv-drop-hint-pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(9, 105, 218, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 0 4px rgba(9, 105, 218, 0);
+      }
+    }
+
     .tv-drop-over {
       position: absolute;
       box-sizing: border-box;
       border: 2px solid #0969da;
       border-radius: 4px;
       background: rgba(9, 105, 218, 0.08);
+      animation: tv-drop-over-appear 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: top 100ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                  left 100ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                  width 100ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                  height 100ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes tv-drop-over-appear {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
   `,
 })

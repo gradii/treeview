@@ -76,6 +76,14 @@ import { LoadMoreNode } from './tree-model';
       user-select: none;
       box-sizing: border-box;
     }
+
+    /* Smooth transitions for load-more state changes */
+    :host-context(.tv-animate) .tv-load-more {
+      transition: background var(--tv-anim-duration) var(--tv-anim-easing),
+                  color var(--tv-anim-duration) var(--tv-anim-easing),
+                  box-shadow var(--tv-anim-duration) var(--tv-anim-easing);
+    }
+
     .tv-load-more:hover {
       background: var(--tv-bg-hover);
     }
@@ -102,6 +110,16 @@ import { LoadMoreNode } from './tree-model';
       font-size: 0.8em;
       line-height: 1;
     }
+
+    /* Smooth scale animation for the icon */
+    :host-context(.tv-animate) .tv-load-more .icon {
+      transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .tv-load-more:hover .icon {
+      transform: scale(1.1);
+    }
+
     .tv-load-more .label {
       flex: 1 1 auto;
       overflow: hidden;

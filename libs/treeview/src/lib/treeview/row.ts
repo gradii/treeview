@@ -92,6 +92,14 @@ import { BlockNode, CollapseNode, RowNode } from './tree-model';
       color: var(--tv-text);
       box-sizing: border-box;
     }
+
+    /* Smooth background transitions when state changes */
+    :host-context(.tv-animate) .tv-row {
+      transition: background var(--tv-anim-duration) var(--tv-anim-easing),
+                  box-shadow var(--tv-anim-duration) var(--tv-anim-easing),
+                  opacity var(--tv-anim-duration) var(--tv-anim-easing);
+    }
+
     .tv-row.is-selected {
       background: var(--tv-bg-selected);
     }

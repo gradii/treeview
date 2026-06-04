@@ -169,6 +169,13 @@ type VisibleChild =
       box-sizing: border-box;
     }
 
+    /* Smooth transitions for header state changes */
+    :host-context(.tv-animate) .tv-header {
+      transition: background var(--tv-anim-duration) var(--tv-anim-easing),
+                  box-shadow var(--tv-anim-duration) var(--tv-anim-easing),
+                  opacity var(--tv-anim-duration) var(--tv-anim-easing);
+    }
+
     .tv-header .caret {
       width: var(--tv-icon-size);
       color: var(--tv-text-subtle);
