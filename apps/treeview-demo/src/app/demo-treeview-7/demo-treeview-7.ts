@@ -89,7 +89,7 @@ export class DemoTreeview7 {
         toRow: itemToRow,
       });
     }
-    this.afterMutation(`Inserted ${newItem.id} at source index ${at}`);
+    this._afterMutation(`Inserted ${newItem.id} at source index ${at}`);
   }
 
   insertBatch(): void {
@@ -116,7 +116,7 @@ export class DemoTreeview7 {
         });
       }
     }
-    this.afterMutation(`Inserted 50 rows starting at source index ${base}`);
+    this._afterMutation(`Inserted 50 rows starting at source index ${base}`);
   }
 
   removeFirstDynamic(): void {
@@ -135,10 +135,10 @@ export class DemoTreeview7 {
       this.status.set('Removal failed');
       return;
     }
-    this.afterMutation(`Removed ${dynItem.id} (source + tree)`);
+    this._afterMutation(`Removed ${dynItem.id} (source + tree)`);
   }
 
-  private afterMutation(msg: string): void {
+  private _afterMutation(msg: string): void {
     this.sourceCount.set(this.bucket.items.length);
     this.status.set(msg);
   }

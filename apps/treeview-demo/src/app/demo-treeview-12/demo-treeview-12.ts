@@ -150,7 +150,7 @@ export class DemoTreeview12 {
     target: RowNode | CollapseNode;
     position: 'before' | 'over' | 'after';
   }): void {
-    this.recordMove('A', e);
+    this._recordMove('A', e);
   }
 
   onRightDropped(e: {
@@ -158,14 +158,14 @@ export class DemoTreeview12 {
     target: RowNode | CollapseNode;
     position: 'before' | 'over' | 'after';
   }): void {
-    this.recordMove('B', e);
+    this._recordMove('B', e);
   }
 
   clearLog(): void {
     this.moves.set([]);
   }
 
-  private recordMove(
+  private _recordMove(
     receiver: 'A' | 'B',
     e: {
       source: RowNode | CollapseNode;

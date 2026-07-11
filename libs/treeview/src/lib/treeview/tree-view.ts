@@ -664,9 +664,9 @@ export class TreeView {
       root: () => this.root(),
       emit: (next) => this.expandedKeysChange.emit(next),
       onChange: (node, expanded) => {
-        this.flashAnimating();
+        this._flashAnimating();
         if (!expanded) {
-          this.keepCollapsedNodeInView(node);
+          this._keepCollapsedNodeInView(node);
         }
       },
     });
@@ -740,7 +740,7 @@ export class TreeView {
           element: hit.element,
         };
       },
-      onDrop: (source, target) => this.handleDrop(source, target),
+      onDrop: (source, target) => this._handleDrop(source, target),
     });
     inject(DestroyRef).onDestroy(() =>
       this.dragService.unregisterTree(this.instance.prefix),
@@ -802,7 +802,7 @@ export class TreeView {
     effect(() => {
       const node = this.navigationController.activeNode();
       if (node === null) return;
-      untracked(() => this.scrollNodeIntoView(node));
+      untracked(() => this._scrollNodeIntoView(node));
     });
 
     afterNextRender(() => {
@@ -899,7 +899,7 @@ export class TreeView {
    * sticky-header stack as a no-go zone at the top. Cheap: walks the parent
    * chain once via `absoluteTopOf`.
    */
-  private scrollNodeIntoView(node: TreeNode): void {
+  private _scrollNodeIntoView(node: TreeNode): void {
     const el = this.scroller().nativeElement;
     const top = absoluteTopOf(node, this.root());
     const height =
@@ -917,7 +917,7 @@ export class TreeView {
     // up and letting a sibling slot into the stack at the boundary.
     const ssh =
       node.kind === 'collapse'
-        ? this.ancestorStickyHeight(node)
+        ? this._ancestorStickyHeight(node)
         : this.stickyStackHeight();
     const viewTop = el.scrollTop + ssh;
     const viewBottom = el.scrollTop + el.clientHeight;
@@ -926,7 +926,7 @@ export class TreeView {
       // non-sticky nodes (rows/loadmore) just put their top at the content top.
       el.scrollTop =
         node.kind === 'collapse'
-          ? this.alignedScrollTopFor(node)
+          ? this._alignedScrollTopFor(node)
           : Math.max(0, top - ssh);
     } else if (bottom > viewBottom) {
       el.scrollTop = bottom - el.clientHeight;
@@ -939,7 +939,7 @@ export class TreeView {
    * `headerSize()`. Used to compute the scrollTop that places `node` flush
    * with the bottom of its ancestor stack.
    */
-  private ancestorStickyHeight(node: TreeNode): number {
+  private _ancestorStickyHeight(node: TreeNode): number {
     const { marginTop } = this.resolvedStickyConfig();
     let total = marginTop;
     let p: BlockNode | CollapseNode | null = node.parent;
@@ -955,9 +955,9 @@ export class TreeView {
    * ancestor stack. With the sticky stack using each node's own `headerSize()`,
    * this collapses to `node.canvasTop − ancestorSsh`.
    */
-  private alignedScrollTopFor(node: CollapseNode): number {
+  private _alignedScrollTopFor(node: CollapseNode): number {
     const top = absoluteTopOf(node, this.root());
-    const ancestorSsh = this.ancestorStickyHeight(node);
+    const ancestorSsh = this._ancestorStickyHeight(node);
     return Math.max(0, top - ancestorSsh);
   }
 
@@ -973,14 +973,14 @@ export class TreeView {
    * descendants) sat in the sticky stack — counting them would scroll one
    * header too far, dropping a sibling slot into the stack at the boundary.
    */
-  private keepCollapsedNodeInView(node: CollapseNode): void {
+  private _keepCollapsedNodeInView(node: CollapseNode): void {
     const el = this.scroller().nativeElement;
     const top = absoluteTopOf(node, this.root());
     const headerBottom = top + node.headerSize();
     const contentTop = el.scrollTop + this.stickyStackHeight();
     const viewportBottom = el.scrollTop + el.clientHeight;
     if (top >= contentTop && headerBottom <= viewportBottom) return;
-    el.scrollTop = this.alignedScrollTopFor(node);
+    el.scrollTop = this._alignedScrollTopFor(node);
   }
 
   /**
@@ -990,13 +990,13 @@ export class TreeView {
    * mutate. Either way, `nodeDropped` fires for callers that want to react
    * (logging, persisting to a server, etc.).
    */
-  private handleDrop(
+  private _handleDrop(
     source: RowNode | CollapseNode,
     target: TreeDropTarget,
   ): void {
     const accessors = this.dragSourceAccessors();
     if (accessors === null) {
-      this.flashAnimating();
+      this._flashAnimating();
       this.nodeDropped.emit({
         source,
         target: target.node,
@@ -1035,7 +1035,7 @@ export class TreeView {
     }
 
     if (mutated) {
-      this.flashAnimating();
+      this._flashAnimating();
       this.nodeDropped.emit({
         source,
         target: target.node,
@@ -1044,7 +1044,7 @@ export class TreeView {
     }
   }
 
-  private flashAnimating(): void {
+  private _flashAnimating(): void {
     if (!this.animate()) return;
     if (this.animTimer !== null) clearTimeout(this.animTimer);
     this.isAnimating.set(true);
@@ -1056,10 +1056,10 @@ export class TreeView {
 }
 
 /**
- * Mirrors the cases `handleDrop` actually mutates. Returns `true` when the
+ * Mirrors the cases `_handleDrop` actually mutates. Returns `true` when the
  * built-in mutator can carry out `source → target [position]`; `false` when
  * the move is structurally impossible (self-drop / cycle / no parent). Called
- * from `resolveTarget` to suppress the hint, and re-checked in `handleDrop`
+ * from `resolveTarget` to suppress the hint, and re-checked in `_handleDrop`
  * as a defensive guard.
  *
  * Like Mac Finder: any folder can host any other folder, regardless of what

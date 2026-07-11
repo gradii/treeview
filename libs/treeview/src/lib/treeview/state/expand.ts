@@ -54,7 +54,7 @@ export class ExpandController {
         const keys = cfg.externalKeys();
         if (keys === null) return;
         const root = cfg.root();
-        untracked(() => this.applyExternalKeys(root, keys));
+        untracked(() => this._applyExternalKeys(root, keys));
       });
     });
   }
@@ -74,7 +74,7 @@ export class ExpandController {
     if (this.isExpanded(node)) return;
     node.setCollapsed(false);
     this.cfg?.onChange?.(node, true);
-    this.emitFromTreeIfExternal();
+    this._emitFromTreeIfExternal();
   }
 
   collapse(node: CollapseNode): void {
@@ -82,10 +82,10 @@ export class ExpandController {
     if (!this.isExpanded(node)) return;
     node.setCollapsed(true);
     this.cfg?.onChange?.(node, false);
-    this.emitFromTreeIfExternal();
+    this._emitFromTreeIfExternal();
   }
 
-  private emitFromTreeIfExternal(): void {
+  private _emitFromTreeIfExternal(): void {
     const cfg = this.cfg;
     if (this.syncing || cfg === null) return;
     const keys = untracked(() => cfg.externalKeys());
@@ -97,7 +97,7 @@ export class ExpandController {
     cfg.emit(next);
   }
 
-  private applyExternalKeys(root: CollapseNode, keys: ReadonlySet<Key>): void {
+  private _applyExternalKeys(root: CollapseNode, keys: ReadonlySet<Key>): void {
     const cfg = this.cfg;
     if (this.syncing || cfg === null) return;
     const keyFn = untracked(() => cfg.keyFn()) ?? defaultKeyFn;

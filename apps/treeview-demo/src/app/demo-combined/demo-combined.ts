@@ -132,11 +132,11 @@ export class DemoCombined {
   }
   resizeRandomRow(): void {
     if (this.source() !== 'stress') return;
-    const row = this.pickRandomRow(this.activeRoot());
+    const row = this._pickRandomRow(this.activeRoot());
     if (row) row.size.set(18 + Math.floor(Math.random() * 200));
   }
 
-  private pickRandomRow(node: CollapseNode): RowNode | null {
+  private _pickRandomRow(node: CollapseNode): RowNode | null {
     // Walk down through either Collapse or Block until we land on a row.
     let cur: CollapseNode | BlockNode = node;
     for (;;) {

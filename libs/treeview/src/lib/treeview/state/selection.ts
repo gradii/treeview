@@ -47,7 +47,7 @@ export class SelectionController {
     const cfg = this.cfg;
     if (cfg === null) return false;
     if (cfg.mode() === 'none') return false;
-    return cfg.selectedKeys().has(this.keyOf(node));
+    return cfg.selectedKeys().has(this._keyOf(node));
   }
 
   /** Reactive: returns true when selection is active (mode ≠ 'none'). */
@@ -63,7 +63,7 @@ export class SelectionController {
     if (mode === 'none') return;
     if (this.disable?.isDisabled(node)) return;
 
-    const key = this.keyOf(node);
+    const key = this._keyOf(node);
 
     if (mode === 'single') {
       cfg.emit(new Set([key]));
@@ -112,7 +112,7 @@ export class SelectionController {
     this.anchor = key;
   }
 
-  private keyOf(node: TreeNode): Key {
+  private _keyOf(node: TreeNode): Key {
     const cfg = this.cfg;
     if (cfg === null) return defaultKeyFn(node);
     return (cfg.keyFn() ?? defaultKeyFn)(node);

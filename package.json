@@ -2,7 +2,9 @@
   "name": "@treeview/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "refactor:private-methods": "node tools/scripts/refactor-private-methods.mts"
+  },
   "private": true,
   "dependencies": {
     "@angular/cdk": "^21.2.11",
@@ -44,6 +46,7 @@
     "nx": "22.7.2",
     "postcss": "^8.4.5",
     "prettier": "~3.6.2",
+    "ts-morph": "^28.0.0",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",

@@ -164,10 +164,10 @@ export class TreeDragService {
     this.source.set(node);
     this.target.set(null);
     this.lastPointer = null;
-    if (cdkDrag !== null) this.registerScrollersWithDragRef(cdkDrag);
-    if (sourceElement !== null) this.createPreview(sourceElement, cdkDrag);
-    this.attachScrollSubscription();
-    this.startAutoScrollLoop();
+    if (cdkDrag !== null) this._registerScrollersWithDragRef(cdkDrag);
+    if (sourceElement !== null) this._createPreview(sourceElement, cdkDrag);
+    this._attachScrollSubscription();
+    this._startAutoScrollLoop();
   }
 
   /**
@@ -201,7 +201,7 @@ export class TreeDragService {
    * `any` because there is no public API for this. The shape is stable
    * across recent CDK majors (v17+), but verify on bumps.
    */
-  private registerScrollersWithDragRef(cdkDrag: CdkDrag): void {
+  private _registerScrollersWithDragRef(cdkDrag: CdkDrag): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dragRef = (cdkDrag as any)._dragRef;
     const positions = dragRef?._parentPositions?.positions as
@@ -211,7 +211,7 @@ export class TreeDragService {
     for (const cfg of this.trees.values()) {
       const el = cfg.scrollerElement();
       if (el === null) continue;
-      for (const target of this.collectScrollables(el)) {
+      for (const target of this._collectScrollables(el)) {
         if (positions.has(target)) continue;
         positions.set(target, {
           scrollPosition: { top: target.scrollTop, left: target.scrollLeft },
@@ -237,7 +237,7 @@ export class TreeDragService {
    * element identity, so an ancestor that's both registered *and* visibly
    * scrollable only gets reported once.
    */
-  private collectScrollables(scroller: HTMLElement): HTMLElement[] {
+  private _collectScrollables(scroller: HTMLElement): HTMLElement[] {
     const out: HTMLElement[] = [scroller];
     const seen = new Set<HTMLElement>([scroller]);
 
@@ -278,8 +278,8 @@ export class TreeDragService {
   trackPointer(clientX: number, clientY: number): void {
     if (this.source() === null) return;
     this.lastPointer = { x: clientX, y: clientY };
-    this.updatePreviewPosition(clientX, clientY);
-    this.runHitTest();
+    this._updatePreviewPosition(clientX, clientY);
+    this._runHitTest();
   }
 
   /**
@@ -320,16 +320,16 @@ export class TreeDragService {
     const src = this.source();
     const tgt = this.target();
     const wasCancelled = this.cancelled;
-    this.detachScrollSubscription();
-    this.stopAutoScrollLoop();
+    this._detachScrollSubscription();
+    this._stopAutoScrollLoop();
     if (!wasCancelled && src !== null && tgt !== null) {
       const cfg = this.trees.get(tgt.ownerPrefix);
       cfg?.onDrop(src, tgt);
-      this.disposePreview();
+      this._disposePreview();
     } else if (src !== null) {
-      this.runSnapBack();
+      this._runSnapBack();
     } else {
-      this.disposePreview();
+      this._disposePreview();
     }
     this.source.set(null);
     this.target.set(null);
@@ -343,7 +343,7 @@ export class TreeDragService {
    * `trackPointer` so the auto-scroll loop can re-run it after each pan
    * (the canvas just shifted under a stationary cursor).
    */
-  private runHitTest(): void {
+  private _runHitTest(): void {
     const src = this.source();
     const p = this.lastPointer;
     if (src === null || p === null) return;
@@ -357,18 +357,18 @@ export class TreeDragService {
     this.target.set(null);
   }
 
-  private startAutoScrollLoop(): void {
+  private _startAutoScrollLoop(): void {
     if (this.autoScrollRaf !== 0) return;
     const tick = () => {
       this.autoScrollRaf = 0;
       if (this.source() === null) return;
-      this.tickAutoScroll();
+      this._tickAutoScroll();
       this.autoScrollRaf = requestAnimationFrame(tick);
     };
     this.autoScrollRaf = requestAnimationFrame(tick);
   }
 
-  private stopAutoScrollLoop(): void {
+  private _stopAutoScrollLoop(): void {
     if (this.autoScrollRaf !== 0) {
       cancelAnimationFrame(this.autoScrollRaf);
       this.autoScrollRaf = 0;
@@ -387,13 +387,13 @@ export class TreeDragService {
    * the tree has hit its own scroll clamp. Matches CDK
    * `DropListRef._startScrollingIfNecessary`: parents first, viewport last.
    */
-  private tickAutoScroll(): void {
+  private _tickAutoScroll(): void {
     const p = this.lastPointer;
     if (p === null) return;
     const HOT = TreeDragService.AUTO_SCROLL_HOT_ZONE;
     const MAX = TreeDragService.AUTO_SCROLL_MAX_SPEED;
 
-    for (const c of this.collectScrollCandidates()) {
+    for (const c of this._collectScrollCandidates()) {
       const rect = c.rect;
       if (p.x < rect.left || p.x > rect.right) continue;
       if (p.y < rect.top || p.y > rect.bottom) continue;
@@ -413,7 +413,7 @@ export class TreeDragService {
       // Hit a clamp (top:0 or bottom:max) — content didn't actually move,
       // so try the next outer container.
       if (after === before) continue;
-      this.runHitTest();
+      this._runHitTest();
       return;
     }
   }
@@ -425,7 +425,7 @@ export class TreeDragService {
    * the window viewport as a final fallback. De-duplicates ancestors when
    * multiple trees share them.
    */
-  private collectScrollCandidates(): ScrollCandidate[] {
+  private _collectScrollCandidates(): ScrollCandidate[] {
     const out: ScrollCandidate[] = [];
     const seen = new Set<Element>();
     for (const cfg of this.trees.values()) {
@@ -465,7 +465,7 @@ export class TreeDragService {
    * grabs. The field is CDK-internal; the shape has been stable across
    * recent CDK majors (v17+) but verify on bumps.
    */
-  private createPreview(source: HTMLElement, cdkDrag: CdkDrag | null): void {
+  private _createPreview(source: HTMLElement, cdkDrag: CdkDrag | null): void {
     const rect = source.getBoundingClientRect();
     // Source may already be detached / culled — bail rather than emit a
     // zero-sized preview that the user can't see.
@@ -513,7 +513,7 @@ export class TreeDragService {
     this.preview = preview;
   }
 
-  private updatePreviewPosition(clientX: number, clientY: number): void {
+  private _updatePreviewPosition(clientX: number, clientY: number): void {
     if (this.preview === null || this.previewPickupOffset === null) return;
     const x = clientX - this.previewPickupOffset.x;
     const y = clientY - this.previewPickupOffset.y;
@@ -527,11 +527,11 @@ export class TreeDragService {
    * When the preview is missing (drag start was suppressed due to a culled
    * source), falls back to a simple dispose so callers don't wedge.
    */
-  private runSnapBack(): void {
+  private _runSnapBack(): void {
     const preview = this.preview;
     const initialRect = this.previewInitialRect;
     if (preview === null || initialRect === null) {
-      this.disposePreview();
+      this._disposePreview();
       return;
     }
     preview.style.transition =
@@ -557,7 +557,7 @@ export class TreeDragService {
     }, 280);
   }
 
-  private disposePreview(): void {
+  private _disposePreview(): void {
     const preview = this.preview;
     if (preview === null) return;
     if (supportsPopover(preview)) {
@@ -586,13 +586,13 @@ export class TreeDragService {
    * `lastPointer` it reads is whatever was last reported by the user's
    * pointer event, which is still the correct viewport coordinate.
    */
-  private attachScrollSubscription(): void {
+  private _attachScrollSubscription(): void {
     this.scrollSubscription = this.scrollDispatcher
       .scrolled()
-      .subscribe(() => this.runHitTest());
+      .subscribe(() => this._runHitTest());
   }
 
-  private detachScrollSubscription(): void {
+  private _detachScrollSubscription(): void {
     this.scrollSubscription?.unsubscribe();
     this.scrollSubscription = null;
   }
@@ -640,7 +640,7 @@ function supportsPopover(el: HTMLElement): el is PopoverElement {
 /**
  * Uniform handle over a scroll container — either an HTMLElement
  * (treeview scroller / page-level wrapper / etc.) or the window viewport.
- * Lets `tickAutoScroll` treat them identically when it pans them.
+ * Lets `_tickAutoScroll` treat them identically when it pans them.
  */
 interface ScrollCandidate {
   readonly rect: { top: number; bottom: number; left: number; right: number };
@@ -673,7 +673,7 @@ function toWindowCandidate(): ScrollCandidate {
 
 /**
  * Cheap "is this element a vertical scroll container that could actually
- * pan?" check. Used by `tickAutoScroll` — we need both: a scrollable
+ * pan?" check. Used by `_tickAutoScroll` — we need both: a scrollable
  * overflow rule AND content that exceeds the visible area — otherwise
  * scrollTop writes silently no-op and we'd waste a frame trying.
  */

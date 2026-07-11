@@ -71,7 +71,7 @@ export class DemoTreeview11 {
   readonly moves = signal<string[]>([]);
   readonly useHandle = signal(false);
 
-  private logMove(
+  private _logMove(
     receiver: 'Backlog' | 'Sprint',
     e: {
       source: RowNode | CollapseNode;
@@ -93,7 +93,7 @@ export class DemoTreeview11 {
     target: RowNode | CollapseNode;
     position: 'before' | 'over' | 'after';
   }): void {
-    this.logMove('Backlog', e);
+    this._logMove('Backlog', e);
   }
 
   onRightDropped(e: {
@@ -101,7 +101,7 @@ export class DemoTreeview11 {
     target: RowNode | CollapseNode;
     position: 'before' | 'over' | 'after';
   }): void {
-    this.logMove('Sprint', e);
+    this._logMove('Sprint', e);
   }
 
   toggleHandle(): void {
