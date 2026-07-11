@@ -22,7 +22,7 @@ import { TreeDragService } from './tree-drag.service';
   selector: 'app-drop-hint',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (linePlacement(); as p) {
+    @if (_linePlacement(); as p) {
       <div
         class="tv-drop-hint"
         [style.top.px]="p.top"
@@ -31,7 +31,7 @@ import { TreeDragService } from './tree-drag.service';
         aria-hidden="true"
       ></div>
     }
-    @if (overPlacement(); as p) {
+    @if (_overPlacement(); as p) {
       <div
         class="tv-drop-over"
         [style.top.px]="p.top"
@@ -132,7 +132,7 @@ export class DropHint {
   private readonly drag = inject(TreeDragService);
 
   /** Used when `position` is `before` or `after` — a 2px line at the edge. */
-  protected readonly linePlacement = computed<
+  protected readonly _linePlacement = computed<
     | { top: number; left: number; width: number }
     | null
   >(() => {
@@ -153,7 +153,7 @@ export class DropHint {
   });
 
   /** Used when `position` is `over` — a rectangle outline around the row. */
-  protected readonly overPlacement = computed<
+  protected readonly _overPlacement = computed<
     | { top: number; left: number; width: number; height: number }
     | null
   >(() => {

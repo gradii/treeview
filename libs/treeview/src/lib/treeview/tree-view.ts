@@ -83,51 +83,51 @@ interface StickyItem {
         cdkScrollable
         tabindex="0"
         role="tree"
-        [attr.aria-multiselectable]="ariaMultiselectable()"
-        [attr.aria-activedescendant]="ariaActiveDescendant()"
+        [attr.aria-multiselectable]="_ariaMultiselectable()"
+        [attr.aria-activedescendant]="_ariaActiveDescendant()"
         (scroll)="onScroll()"
         (keydown)="onKeyDown($event)"
       >
         <div class="sticky-stack">
-          @if (stickyItems().length > 0) {
+          @if (_stickyItems().length > 0) {
             <div
               class="sticky-backplate"
-              [style.top.px]="resolvedStickyConfig().marginTop"
-              [style.left.px]="resolvedStickyConfig().marginLeft"
-              [style.right.px]="resolvedStickyConfig().marginRight"
+              [style.top.px]="_resolvedStickyConfig().marginTop"
+              [style.left.px]="_resolvedStickyConfig().marginLeft"
+              [style.right.px]="_resolvedStickyConfig().marginRight"
               [style.height.px]="
-                stickyStackHeight() - resolvedStickyConfig().marginTop
+                _stickyStackHeight() - _resolvedStickyConfig().marginTop
               "
             ></div>
           }
-          @for (item of stickyItems(); track item.node.id) {
+          @for (item of _stickyItems(); track item.node.id) {
             <div
               class="tv-header sticky"
               role="treeitem"
-              [id]="instance.domIdFor(item.node.id)"
+              [id]="_instance.domIdFor(item.node.id)"
               [class.collapsed]="item.node.collapsed()"
-              [class.is-active]="navigationController.isActive(item.node)"
-              [class.is-disabled]="disableController.isDisabled(item.node)"
-              [class.is-drag-source]="dragService.source() === item.node"
-              [class.is-in-drag-subtree]="isStickyInDragSubtree(item.node)"
+              [class.is-active]="_navigationController.isActive(item.node)"
+              [class.is-disabled]="_disableController.isDisabled(item.node)"
+              [class.is-drag-source]="_dragService.source() === item.node"
+              [class.is-in-drag-subtree]="_isStickyInDragSubtree(item.node)"
               [style.top.px]="item.top"
-              [style.left.px]="resolvedStickyConfig().marginLeft"
-              [style.right.px]="resolvedStickyConfig().marginRight"
+              [style.left.px]="_resolvedStickyConfig().marginLeft"
+              [style.right.px]="_resolvedStickyConfig().marginRight"
               [style.height.px]="item.node.headerSize()"
               [style.--tv-depth]="item.node.depth()"
               (wheel)="onStickyWheel($event)"
               (click)="onStickyClick(item.node, $event)"
-              [class.is-selected]="selectionController.isSelected(item.node)"
-              [attr.aria-selected]="selectionMode() !== 'none' ? selectionController.isSelected(item.node) : null"
-              [attr.aria-disabled]="disableController.isDisabled(item.node) ? true : null"
+              [class.is-selected]="_selectionController.isSelected(item.node)"
+              [attr.aria-selected]="selectionMode() !== 'none' ? _selectionController.isSelected(item.node) : null"
+              [attr.aria-disabled]="_disableController.isDisabled(item.node) ? true : null"
             >
               <span class="caret" [class.is-expanded]="!item.node.collapsed()">▶</span>
-              @if (checkController.isEnabled()) {
+              @if (_checkController.isEnabled()) {
                 <input
                   type="checkbox"
                   class="tv-check"
-                  [checked]="checkController.getState(item.node) === 'checked'"
-                  [indeterminate]="checkController.getState(item.node) === 'indeterminate'"
+                  [checked]="_checkController.getState(item.node) === 'checked'"
+                  [indeterminate]="_checkController.getState(item.node) === 'indeterminate'"
                   (click)="onStickyCheckClick(item.node, $event)"
                 />
               }
@@ -138,20 +138,20 @@ interface StickyItem {
         </div>
         <div
           class="canvas"
-          [class.is-animating]="isAnimating()"
-          [style.height.px]="totalHeight()"
+          [class.is-animating]="_isAnimating()"
+          [style.height.px]="_totalHeight()"
         >
           <app-collapse
             [node]="root()"
             [offset]="0"
             [absoluteOrigin]="0"
-            [viewportTop]="effectiveViewportTop()"
-            [viewportBottom]="effectiveViewportBottom()"
-            [stickyIds]="stickyIds()"
+            [viewportTop]="_effectiveViewportTop()"
+            [viewportBottom]="_effectiveViewportBottom()"
+            [stickyIds]="_stickyIds()"
           />
         </div>
       </div>
-      <app-drop-hint [scrollerRect]="scrollerRect()"/>
+      <app-drop-hint [scrollerRect]="_scrollerRect()"/>
     </div>
   `,
   styles: `
@@ -517,15 +517,15 @@ export class TreeView {
     position: 'before' | 'over' | 'after';
   }>();
 
-  protected readonly expandController = inject(ExpandController);
-  protected readonly selectionController = inject(SelectionController);
-  protected readonly checkController = inject(CheckController);
-  protected readonly navigationController = inject(NavigationController);
-  protected readonly filterController = inject(FilterController);
-  protected readonly disableController = inject(DisableController);
-  protected readonly templateRegistry = inject(NodeTemplateRegistry);
-  protected readonly dragService = inject(TreeDragService);
-  protected readonly instance = inject(TreeViewInstance);
+  protected readonly _expandController = inject(ExpandController);
+  protected readonly _selectionController = inject(SelectionController);
+  protected readonly _checkController = inject(CheckController);
+  protected readonly _navigationController = inject(NavigationController);
+  protected readonly _filterController = inject(FilterController);
+  protected readonly _disableController = inject(DisableController);
+  protected readonly _templateRegistry = inject(NodeTemplateRegistry);
+  protected readonly _dragService = inject(TreeDragService);
+  protected readonly _instance = inject(TreeViewInstance);
   private readonly scrollDispatcher = inject(ScrollDispatcher);
 
   /**
@@ -533,28 +533,28 @@ export class TreeView {
    * this LargeTreeView and forwards it to the registry. Row / Collapse pick
    * the template up reactively from the registry signal.
    */
-  protected readonly nodeTemplateRef = contentChild(NodeTemplateDirective);
+  protected readonly _nodeTemplateRef = contentChild(NodeTemplateDirective);
 
-  protected readonly scroller =
+  protected readonly _scroller =
     viewChild.required<ElementRef<HTMLDivElement>>('scroller');
 
-  protected readonly scrollTop = signal(0);
-  protected readonly viewportHeight = signal(600);
+  protected readonly _scrollTop = signal(0);
+  protected readonly _viewportHeight = signal(600);
 
-  protected readonly totalHeight = computed(() => this.root().height());
+  protected readonly _totalHeight = computed(() => this.root().height());
 
-  protected readonly stickies = computed<CollapseNode[]>(() => {
+  protected readonly _stickies = computed<CollapseNode[]>(() => {
     if (!this.stickyHeaders()) return [];
-    const { marginTop } = this.resolvedStickyConfig();
+    const { marginTop } = this._resolvedStickyConfig();
     return collectStickyAncestors(
       this.root(),
-      this.scrollTop(),
+      this._scrollTop(),
       marginTop,
     );
   });
 
   /** Resolved sticky config with defaults filled in. */
-  protected readonly resolvedStickyConfig = computed(() => {
+  protected readonly _resolvedStickyConfig = computed(() => {
     const c = this.stickyConfig();
     return {
       marginTop: c.marginTop ?? 0,
@@ -568,9 +568,9 @@ export class TreeView {
    * sticky sits at `marginTop`, the next stacks below it, etc. Each item's
    * height comes from its node's `headerSize()`, so items can vary in size.
    */
-  protected readonly stickyItems = computed<StickyItem[]>(() => {
-    const stickies = this.stickies();
-    const { marginTop } = this.resolvedStickyConfig();
+  protected readonly _stickyItems = computed<StickyItem[]>(() => {
+    const stickies = this._stickies();
+    const { marginTop } = this._resolvedStickyConfig();
     const items: StickyItem[] = [];
     let off = marginTop;
     for (let i = 0; i < stickies.length; i++) {
@@ -585,32 +585,32 @@ export class TreeView {
    * Total height the sticky stack occupies in the viewport, including the
    * top margin. Used as the canvas-content top inset for viewport culling.
    */
-  protected readonly stickyStackHeight = computed(() => {
-    const stickies = this.stickies();
+  protected readonly _stickyStackHeight = computed(() => {
+    const stickies = this._stickies();
     if (stickies.length === 0) return 0;
-    const { marginTop } = this.resolvedStickyConfig();
+    const { marginTop } = this._resolvedStickyConfig();
     let total = marginTop;
     for (const node of stickies) total += node.headerSize();
     return total;
   });
 
-  protected readonly stickyIds = computed<ReadonlySet<string>>(() => {
+  protected readonly _stickyIds = computed<ReadonlySet<string>>(() => {
     const ids = new Set<string>();
-    for (const c of this.stickies()) ids.add(c.id);
+    for (const c of this._stickies()) ids.add(c.id);
     return ids;
   });
 
-  protected readonly effectiveViewportTop = computed(() => {
-    const ssh = this.stickyStackHeight();
+  protected readonly _effectiveViewportTop = computed(() => {
+    const ssh = this._stickyStackHeight();
     const overscanTop = ssh > 0 ? 0 : this.overscan();
-    return this.scrollTop() + ssh - overscanTop;
+    return this._scrollTop() + ssh - overscanTop;
   });
 
-  protected readonly effectiveViewportBottom = computed(
-    () => this.scrollTop() + this.viewportHeight() + this.overscan(),
+  protected readonly _effectiveViewportBottom = computed(
+    () => this._scrollTop() + this._viewportHeight() + this.overscan(),
   );
 
-  protected readonly ariaMultiselectable = computed(() =>
+  protected readonly _ariaMultiselectable = computed(() =>
     this.selectionMode() === 'multiple' ? 'true' : null,
   );
 
@@ -619,10 +619,10 @@ export class TreeView {
    * announce moves without us having to shuffle DOM focus around. We prefix
    * the node id to dodge collisions with whatever the consumer puts in `id`.
    */
-  protected readonly ariaActiveDescendant = computed<string | null>(() => {
-    const node = this.navigationController.activeNode();
+  protected readonly _ariaActiveDescendant = computed<string | null>(() => {
+    const node = this._navigationController.activeNode();
     if (node === null) return null;
-    return this.instance.domIdFor(node.id);
+    return this._instance.domIdFor(node.id);
   });
 
   /**
@@ -630,7 +630,7 @@ export class TreeView {
    * either a RowNode or a CollapseNode. Built from a fresh walk on every tree
    * change; used by the drop hit-tester to resolve DOM-side ids.
    */
-  protected readonly nodesById = computed<
+  protected readonly _nodesById = computed<
     ReadonlyMap<string, RowNode | CollapseNode>
   >(() => {
     const map = new Map<string, RowNode | CollapseNode>();
@@ -642,7 +642,7 @@ export class TreeView {
    * Cached scroller `DOMRect` for the DropHint to position relative to. Updated
    * on `scroll` (the hint moves with the canvas) and `resize`.
    */
-  protected readonly scrollerRect = signal<DOMRect | null>(null);
+  protected readonly _scrollerRect = signal<DOMRect | null>(null);
 
   /**
    * Pulsed `true` for ~300ms after a successful drop so rows whose vertical
@@ -651,14 +651,14 @@ export class TreeView {
    * present (so normal scrolling — where row tops also change as rows enter
    * the viewport — stays snappy).
    */
-  protected readonly isAnimating = signal(false);
+  protected readonly _isAnimating = signal(false);
   private animTimer: ReturnType<typeof setTimeout> | null = null;
 
   private rafId = 0;
   private resizeObs: ResizeObserver | undefined;
 
   constructor() {
-    this.expandController.configure({
+    this._expandController.configure({
       keyFn: () => this.keyFn(),
       externalKeys: () => this.expandedKeys(),
       root: () => this.root(),
@@ -670,57 +670,57 @@ export class TreeView {
         }
       },
     });
-    this.selectionController.configure({
+    this._selectionController.configure({
       keyFn: () => this.keyFn(),
       mode: () => this.selectionMode(),
       selectedKeys: () => this.selectedKeys(),
       root: () => this.root(),
       emit: (next) => this.selectedKeysChange.emit(next),
     });
-    this.checkController.configure({
+    this._checkController.configure({
       keyFn: () => this.keyFn(),
       settings: () => this.checkable(),
       checkedKeys: () => this.checkedKeys(),
       root: () => this.root(),
       emit: (next) => this.checkedKeysChange.emit(next),
     });
-    this.navigationController.configure({
+    this._navigationController.configure({
       keyFn: () => this.keyFn(),
       root: () => this.root(),
     });
-    this.navigationController.bind({
-      expand: this.expandController,
-      selection: this.selectionController,
-      check: this.checkController,
+    this._navigationController.bind({
+      expand: this._expandController,
+      selection: this._selectionController,
+      check: this._checkController,
     });
-    this.filterController.configure({
+    this._filterController.configure({
       term: () => this.filter(),
       settings: () => this.filterSettings(),
       root: () => this.root(),
       autoExpandMatches: () => this.autoExpandFilterMatches(),
       onAutoExpand: (nodes) => {
-        for (const n of nodes) this.expandController.expand(n);
+        for (const n of nodes) this._expandController.expand(n);
       },
     });
-    this.disableController.configure({
+    this._disableController.configure({
       keyFn: () => this.keyFn(),
       disabledKeys: () => this.disabledKeys(),
       disableParentNodesOnly: () => this.disableParentNodesOnly(),
       expandDisabledNodes: () => this.expandDisabledNodes(),
       root: () => this.root(),
     });
-    this.dragService.registerTree({
-      prefix: this.instance.prefix,
+    this._dragService.registerTree({
+      prefix: this._instance.prefix,
       enabled: () => this.allowDrag(),
       dragHandle: () => this.dragHandle(),
-      scrollerElement: () => this.scroller()?.nativeElement ?? null,
+      scrollerElement: () => this._scroller()?.nativeElement ?? null,
       resolveTarget: (x, y, source) => {
         const hit = hitTestRow({
           clientX: x,
           clientY: y,
           source,
-          instancePrefix: this.instance.prefix,
-          resolveNode: (id) => this.nodesById().get(id) ?? null,
+          instancePrefix: this._instance.prefix,
+          resolveNode: (id) => this._nodesById().get(id) ?? null,
         });
         if (hit === null) return null;
         // Hide the drop hint for moves the built-in mutator can't carry out
@@ -734,7 +734,7 @@ export class TreeView {
           return null;
         }
         return {
-          ownerPrefix: this.instance.prefix,
+          ownerPrefix: this._instance.prefix,
           node: hit.node,
           position: hit.position,
           element: hit.element,
@@ -743,16 +743,16 @@ export class TreeView {
       onDrop: (source, target) => this._handleDrop(source, target),
     });
     inject(DestroyRef).onDestroy(() =>
-      this.dragService.unregisterTree(this.instance.prefix),
+      this._dragService.unregisterTree(this._instance.prefix),
     );
 
     // Escape cancels an in-flight drag — register the listener only while a
     // drag is actually active so we don't burden every keystroke otherwise.
     effect((onCleanup) => {
-      if (!this.dragService.isDragging()) return;
+      if (!this._dragService.isDragging()) return;
       const handler = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          this.dragService.cancel();
+          this._dragService.cancel();
           e.preventDefault();
           e.stopPropagation();
         }
@@ -773,17 +773,17 @@ export class TreeView {
     // standard CDK pattern for global scroll observation.
     //
     // An initial sync at drag start is also required: page scrolling that
-    // happened *before* the drag won't have refreshed `scrollerRect` (its
+    // happened *before* the drag won't have refreshed `_scrollerRect` (its
     // listeners only fire while we're subscribed), so the very first frame
     // of the drag would otherwise paint the indicator at the cached rect
     // from whenever the scroller last scrolled — typically off by the
     // accumulated page scroll delta.
     effect((onCleanup) => {
-      if (!this.dragService.isDragging()) return;
-      const el = this.scroller().nativeElement;
-      this.scrollerRect.set(el.getBoundingClientRect());
+      if (!this._dragService.isDragging()) return;
+      const el = this._scroller().nativeElement;
+      this._scrollerRect.set(el.getBoundingClientRect());
       const sub = this.scrollDispatcher.scrolled().subscribe(() => {
-        this.scrollerRect.set(el.getBoundingClientRect());
+        this._scrollerRect.set(el.getBoundingClientRect());
       });
       onCleanup(() => sub.unsubscribe());
     });
@@ -792,29 +792,29 @@ export class TreeView {
     // the shared registry on every change. `contentChild` returns a signal,
     // so the effect re-runs when the directive instance appears/disappears.
     effect(() => {
-      const directive = this.nodeTemplateRef();
-      this.templateRegistry.set(directive?.templateRef ?? null);
+      const directive = this._nodeTemplateRef();
+      this._templateRegistry.set(directive?.templateRef ?? null);
     });
 
     // When the active node changes, scroll it into view. Skipped while the
     // user is mid-scroll: this effect only fires on `activeNode` changes, not
-    // on every scrollTop update.
+    // on every `_scrollTop` update.
     effect(() => {
-      const node = this.navigationController.activeNode();
+      const node = this._navigationController.activeNode();
       if (node === null) return;
       untracked(() => this._scrollNodeIntoView(node));
     });
 
     afterNextRender(() => {
-      const el = this.scroller().nativeElement;
-      this.viewportHeight.set(el.clientHeight);
-      this.scrollerRect.set(el.getBoundingClientRect());
+      const el = this._scroller().nativeElement;
+      this._viewportHeight.set(el.clientHeight);
+      this._scrollerRect.set(el.getBoundingClientRect());
       if (typeof ResizeObserver === 'undefined') return;
       this.resizeObs = new ResizeObserver((entries) => {
         for (const e of entries) {
-          this.viewportHeight.set(e.contentRect.height);
+          this._viewportHeight.set(e.contentRect.height);
         }
-        this.scrollerRect.set(el.getBoundingClientRect());
+        this._scrollerRect.set(el.getBoundingClientRect());
       });
       this.resizeObs.observe(el);
     });
@@ -829,12 +829,12 @@ export class TreeView {
     if (this.rafId) return;
     this.rafId = requestAnimationFrame(() => {
       this.rafId = 0;
-      const el = this.scroller().nativeElement;
-      this.scrollTop.set(el.scrollTop);
+      const el = this._scroller().nativeElement;
+      this._scrollTop.set(el.scrollTop);
       // Refresh the cached rect — auto-scroll during drag moves the canvas,
       // but the scroller element's getBoundingClientRect is stable; updating
       // here is cheap and keeps the rect in sync after layout changes too.
-      this.scrollerRect.set(el.getBoundingClientRect());
+      this._scrollerRect.set(el.getBoundingClientRect());
     });
   }
 
@@ -845,7 +845,7 @@ export class TreeView {
    */
   onStickyWheel(e: WheelEvent): void {
     e.preventDefault();
-    this.scroller().nativeElement.scrollBy({
+    this._scroller().nativeElement.scrollBy({
       top: e.deltaY,
       left: e.deltaX,
     });
@@ -858,26 +858,26 @@ export class TreeView {
    */
   onStickyClick(node: CollapseNode, event: MouseEvent): void {
     const hasModifier = event.ctrlKey || event.metaKey || event.shiftKey;
-    if (!hasModifier) this.expandController.toggle(node);
-    this.navigationController.setActive(node);
-    this.selectionController.handleClick(node, event);
-    this.checkController.handleRowClick(node);
+    if (!hasModifier) this._expandController.toggle(node);
+    this._navigationController.setActive(node);
+    this._selectionController.handleClick(node, event);
+    this._checkController.handleRowClick(node);
   }
 
   onStickyCheckClick(node: CollapseNode, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.navigationController.setActive(node);
-    this.checkController.toggle(node);
+    this._navigationController.setActive(node);
+    this._checkController.toggle(node);
   }
 
   /**
-   * Match `Collapse.isInDragSubtree` for sticky-stack headers — the regular
+   * Match `Collapse._isInDragSubtree` for sticky-stack headers — the regular
    * collapse component skips rendering when sticky, so the sticky overlay
    * needs its own dim binding to stay consistent during drag.
    */
-  protected isStickyInDragSubtree(node: CollapseNode): boolean {
-    const src = this.dragService.source();
+  protected _isStickyInDragSubtree(node: CollapseNode): boolean {
+    const src = this._dragService.source();
     if (src === null || src.kind !== 'collapse') return false;
     let cur: BlockNode | CollapseNode | null = node.parent;
     while (cur !== null) {
@@ -888,7 +888,7 @@ export class TreeView {
   }
 
   onKeyDown(event: KeyboardEvent): void {
-    if (this.navigationController.handleKey(event)) {
+    if (this._navigationController.handleKey(event)) {
       event.preventDefault();
       event.stopPropagation();
     }
@@ -900,7 +900,7 @@ export class TreeView {
    * chain once via `absoluteTopOf`.
    */
   private _scrollNodeIntoView(node: TreeNode): void {
-    const el = this.scroller().nativeElement;
+    const el = this._scroller().nativeElement;
     const top = absoluteTopOf(node, this.root());
     const height =
       node.kind === 'row'
@@ -918,7 +918,7 @@ export class TreeView {
     const ssh =
       node.kind === 'collapse'
         ? this._ancestorStickyHeight(node)
-        : this.stickyStackHeight();
+        : this._stickyStackHeight();
     const viewTop = el.scrollTop + ssh;
     const viewBottom = el.scrollTop + el.clientHeight;
     if (top < viewTop) {
@@ -940,7 +940,7 @@ export class TreeView {
    * with the bottom of its ancestor stack.
    */
   private _ancestorStickyHeight(node: TreeNode): number {
-    const { marginTop } = this.resolvedStickyConfig();
+    const { marginTop } = this._resolvedStickyConfig();
     let total = marginTop;
     let p: BlockNode | CollapseNode | null = node.parent;
     while (p !== null) {
@@ -969,15 +969,15 @@ export class TreeView {
    * bottom), don't jerk the scroll: the user can see what they just collapsed.
    *
    * Uses the **ancestor** sticky height for the new scrollTop (not the current
-   * `stickyStackHeight()`): before the collapse, `node` itself (and possibly
+   * `_stickyStackHeight()`): before the collapse, `node` itself (and possibly
    * descendants) sat in the sticky stack — counting them would scroll one
    * header too far, dropping a sibling slot into the stack at the boundary.
    */
   private _keepCollapsedNodeInView(node: CollapseNode): void {
-    const el = this.scroller().nativeElement;
+    const el = this._scroller().nativeElement;
     const top = absoluteTopOf(node, this.root());
     const headerBottom = top + node.headerSize();
-    const contentTop = el.scrollTop + this.stickyStackHeight();
+    const contentTop = el.scrollTop + this._stickyStackHeight();
     const viewportBottom = el.scrollTop + el.clientHeight;
     if (top >= contentTop && headerBottom <= viewportBottom) return;
     el.scrollTop = this._alignedScrollTopFor(node);
@@ -1047,9 +1047,9 @@ export class TreeView {
   private _flashAnimating(): void {
     if (!this.animate()) return;
     if (this.animTimer !== null) clearTimeout(this.animTimer);
-    this.isAnimating.set(true);
+    this._isAnimating.set(true);
     this.animTimer = setTimeout(() => {
-      this.isAnimating.set(false);
+      this._isAnimating.set(false);
       this.animTimer = null;
     }, TV_ANIMATION_DURATION_MS);
   }

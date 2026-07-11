@@ -44,10 +44,10 @@ interface PlaceholderSlot {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.top.px]': 'offset()',
-    '[style.height.px]': 'height()',
+    '[style.height.px]': '_height()',
   },
   template: `
-    @for (item of visibleChildren(); track item.key) {
+    @for (item of _visibleChildren(); track item.key) {
       @switch (item.kind) {
         @case ('row') {
           <app-row
@@ -60,7 +60,7 @@ interface PlaceholderSlot {
           <app-block
             [block]="item.node"
             [offset]="item.top"
-            [absoluteOrigin]="absoluteTop()"
+            [absoluteOrigin]="_absoluteTop()"
             [viewportTop]="viewportTop()"
             [viewportBottom]="viewportBottom()"
             [rowDepth]="rowDepth()"
@@ -70,20 +70,20 @@ interface PlaceholderSlot {
           <app-collapse
             [node]="item.node"
             [offset]="item.top"
-            [absoluteOrigin]="absoluteTop()"
+            [absoluteOrigin]="_absoluteTop()"
             [viewportTop]="viewportTop()"
             [viewportBottom]="viewportBottom()"
           />
         }
       }
     }
-    @if (isLeaf()) {
-      @for (slot of placeholderSlots(); track slot.key) {
+    @if (_isLeaf()) {
+      @for (slot of _placeholderSlots(); track slot.key) {
         <div
           class="tv-placeholder"
-          [class.is-idle]="loadState() === 'idle'"
-          [class.is-loading]="loadState() === 'loading'"
-          [class.has-error]="loadState() === 'error'"
+          [class.is-idle]="_loadState() === 'idle'"
+          [class.is-loading]="_loadState() === 'loading'"
+          [class.has-error]="_loadState() === 'error'"
           [style.top.px]="slot.top"
           [style.height.px]="slot.height"
           [style.--tv-depth]="rowDepth()"
@@ -184,25 +184,25 @@ export class Block {
    */
   readonly rowDepth = input<number>(0);
 
-  protected readonly height = computed(() => this.block().height());
-  protected readonly loadState = computed(() => this.block().loadState());
+  protected readonly _height = computed(() => this.block().height());
+  protected readonly _loadState = computed(() => this.block().loadState());
 
   /**
    * The absolute Y of this block's top edge in canvas coordinates.
    * Computed by walking parent offsets. The root Collapse passes absolute
    * coordinates via `absoluteOrigin`; nested blocks accumulate from there.
    */
-  protected readonly absoluteTop = computed(() => this.absoluteOrigin() + this.offset());
+  protected readonly _absoluteTop = computed(() => this.absoluteOrigin() + this.offset());
 
   /**
    * Absolute canvas-Y origin of the parent container. Passed down so each
-   * level can compute its own absoluteTop for viewport intersection tests.
+   * level can compute its own `_absoluteTop` for viewport intersection tests.
    */
   readonly absoluteOrigin = input<number>(0);
 
   /** True when no sub-block children — i.e. rows / collapses only, the
    *  "leaf-like" mode where placeholder slots for unloaded rows apply. */
-  protected readonly isLeaf = computed(() => {
+  protected readonly _isLeaf = computed(() => {
     const children = this.block().children();
     for (const c of children) {
       if (c.kind === 'block') return false;
@@ -219,9 +219,9 @@ export class Block {
    * collapses are still viewport-culled; rows are kept always so
    * intra-block focus-scrolling still finds them.
    */
-  protected readonly visibleChildren = computed<VisibleBlockChild[]>(() => {
+  protected readonly _visibleChildren = computed<VisibleBlockChild[]>(() => {
     const children = this.block().children();
-    const absTop = this.absoluteTop();
+    const absTop = this._absoluteTop();
     const vt = this.viewportTop();
     const vb = this.viewportBottom();
     let cursor = 0;
@@ -256,7 +256,7 @@ export class Block {
    * pinned right after the loaded rows since the parent block now uses
    * absolute positioning for everything.
    */
-  protected readonly placeholderSlots = computed<PlaceholderSlot[]>(() => {
+  protected readonly _placeholderSlots = computed<PlaceholderSlot[]>(() => {
     const b = this.block();
     const children = b.children();
     const remaining = Math.max(0, b.totalRowCount() - children.length);
@@ -277,9 +277,9 @@ export class Block {
     return out;
   });
 
-  protected readonly visible = computed(() => {
-    const top = this.absoluteTop();
-    const bottom = top + this.height();
+  protected readonly _visible = computed(() => {
+    const top = this._absoluteTop();
+    const bottom = top + this._height();
     return bottom > this.viewportTop() && top < this.viewportBottom();
   });
 
@@ -292,14 +292,14 @@ export class Block {
       }
     };
     effect(() => {
-      const isVisible = this.visible();
+      const isVisible = this._visible();
       const state = this.block().loadState();
       if (isVisible && state === 'idle') {
         if (loadTimer !== null) return;
         loadTimer = setTimeout(() => {
           loadTimer = null;
           untracked(() => {
-            if (this.visible() && this.block().loadState() === 'idle') {
+            if (this._visible() && this.block().loadState() === 'idle') {
               this.block().ensureLoaded();
             }
           });

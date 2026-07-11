@@ -63,7 +63,7 @@ export interface FilterResult {
  *
  * Block nodes are transparent: they don't carry a label and never match on
  * their own. They're added to `visibleIds` iff any of their child rows are
- * visible — keeps Block.height nonzero when virtualization needs to render.
+ * visible — keeps `BlockNode.height()` nonzero when virtualization needs to render.
  */
 export function applyFilter(
   root: CollapseNode,

@@ -11,7 +11,7 @@ import { groupBlocks } from './chunking';
 export interface LazyBlockOptions<T> {
   /** Stable id for the placeholder block. Must be unique within its tree. */
   readonly id: string;
-  /** Visual / logical depth — only used by Block.depth (no indent contribution). */
+  /** Visual / logical depth — only used by `BlockNode.depth` (no indent contribution). */
   readonly depth?: number;
   /**
    * Total number of rows the block represents. The block sizes itself for

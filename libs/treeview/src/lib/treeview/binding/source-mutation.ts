@@ -311,7 +311,7 @@ export function moveCollapse<TParent, TChild>(
 /**
  * Walk `node` and every CollapseNode descendant, adding `delta` to each
  * `depth` signal. Blocks aren't touched — their visual contribution to
- * indentation comes from `Collapse.childDepth` (read reactively), not from
+ * indentation comes from `Collapse._childDepth` (read reactively), not from
  * `BlockNode.depth` (which is purely logical metadata).
  */
 function shiftCollapseSubtreeDepth(node: CollapseNode, delta: number): void {

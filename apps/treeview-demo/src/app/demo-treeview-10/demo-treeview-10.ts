@@ -98,10 +98,10 @@ interface MoveLog {
 })
 export class DemoTreeview10 {
   // Source of truth — we mutate this array in place. The tree reflects it.
-  protected readonly lanes: Lane[] = JSON.parse(JSON.stringify(INITIAL_LANES));
+  protected readonly _lanes: Lane[] = JSON.parse(JSON.stringify(INITIAL_LANES));
 
   readonly root = computed(() =>
-    buildFromHierarchy<Lane | Task>(this.lanes, {
+    buildFromHierarchy<Lane | Task>(this._lanes, {
       childrenField: (node) =>
         'tasks' in node ? (node.tasks as readonly (Lane | Task)[]) : undefined,
       textField: (node) => ('tasks' in node ? node.name : node.title),
@@ -110,8 +110,8 @@ export class DemoTreeview10 {
       rootLabel: 'Sprint board',
       // Attach the lanes array to the synthetic root's `meta` so
       // `moveCollapse` can splice into it when the user reorders lanes.
-      // `accessors.childrenField(this.lanes)` returns the array itself.
-      rootMeta: this.lanes,
+      // `accessors.childrenField(this._lanes)` returns the array itself.
+      rootMeta: this._lanes,
     }),
   );
 

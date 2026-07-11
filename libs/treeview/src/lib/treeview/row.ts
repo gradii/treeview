@@ -27,43 +27,43 @@ import { BlockNode, CollapseNode, RowNode } from './tree-model';
   template: `
     <div
       class="tv-row"
-      [class.is-drag-source]="isDragSource()"
-      [class.is-in-drag-subtree]="isInDragSubtree()"
+      [class.is-drag-source]="_isDragSource()"
+      [class.is-in-drag-subtree]="_isInDragSubtree()"
       role="treeitem"
-      [id]="domId()"
-      [attr.aria-level]="level()"
-      [attr.aria-posinset]="posInSet()"
-      [attr.aria-setsize]="setSize()"
-      [class.is-selected]="isSelected()"
-      [class.is-active]="isActive()"
-      [class.is-disabled]="isDisabled()"
-      [attr.aria-selected]="ariaSelected()"
-      [attr.aria-disabled]="isDisabled() ? true : null"
+      [id]="_domId()"
+      [attr.aria-level]="_level()"
+      [attr.aria-posinset]="_posInSet()"
+      [attr.aria-setsize]="_setSize()"
+      [class.is-selected]="_isSelected()"
+      [class.is-active]="_isActive()"
+      [class.is-disabled]="_isDisabled()"
+      [attr.aria-selected]="_ariaSelected()"
+      [attr.aria-disabled]="_isDisabled() ? true : null"
       [style.height.px]="row().renderSize()"
       [style.--tv-depth]="depth()"
       cdkDrag
-      [cdkDragDisabled]="!isDraggable()"
-      (cdkDragStarted)="onDragStarted($event)"
-      (cdkDragMoved)="onDragMoved($event)"
-      (cdkDragEnded)="onDragEnded($event)"
-      (click)="onClick($event)"
+      [cdkDragDisabled]="!_isDraggable()"
+      (cdkDragStarted)="_onDragStarted($event)"
+      (cdkDragMoved)="_onDragMoved($event)"
+      (cdkDragEnded)="_onDragEnded($event)"
+      (click)="_onClick($event)"
     >
-      @if (check.isEnabled()) {
+      @if (_check.isEnabled()) {
         <input
           type="checkbox"
           class="tv-check"
-          [checked]="checkedState() === 'checked'"
-          [indeterminate]="checkedState() === 'indeterminate'"
-          (click)="onCheckClick($event)"
+          [checked]="_checkedState() === 'checked'"
+          [indeterminate]="_checkedState() === 'indeterminate'"
+          (click)="_onCheckClick($event)"
         />
       }
-      @if (handleVisible()) {
+      @if (_handleVisible()) {
         <span class="tv-drag-grip" cdkDragHandle aria-hidden="true">⠿</span>
       }
-      @if (customTemplate(); as tpl) {
+      @if (_customTemplate(); as tpl) {
         <ng-container
           [ngTemplateOutlet]="tpl"
-          [ngTemplateOutletContext]="templateContext()"
+          [ngTemplateOutletContext]="_templateContext()"
         />
       } @else {
         <span class="row-label">{{ row().label() }}</span>
@@ -176,31 +176,31 @@ export class Row {
   private readonly templates = inject(NodeTemplateRegistry);
   private readonly drag = inject(TreeDragService);
   private readonly instance = inject(TreeViewInstance);
-  protected readonly check = inject(CheckController);
+  protected readonly _check = inject(CheckController);
 
-  protected readonly isSelected = computed(() =>
+  protected readonly _isSelected = computed(() =>
     this.selection.isSelected(this.row()),
   );
 
-  protected readonly ariaSelected = computed(() => {
+  protected readonly _ariaSelected = computed(() => {
     if (!this.selection.isEnabled()) return null;
-    return this.isSelected();
+    return this._isSelected();
   });
 
-  protected readonly checkedState = computed(() =>
-    this.check.getState(this.row()),
+  protected readonly _checkedState = computed(() =>
+    this._check.getState(this.row()),
   );
 
-  protected readonly isActive = computed(() =>
+  protected readonly _isActive = computed(() =>
     this.navigation.isActive(this.row()),
   );
 
-  protected readonly isDisabled = computed(() =>
+  protected readonly _isDisabled = computed(() =>
     this.disable.isDisabled(this.row()),
   );
 
   /** Source of the current in-flight drag — used to dim the original row. */
-  protected readonly isDragSource = computed(
+  protected readonly _isDragSource = computed(
     () => this.drag.source() === this.row(),
   );
 
@@ -210,7 +210,7 @@ export class Row {
    * drops on these rows; this signal lets the row paint itself as a
    * non-target so the user sees why nothing happens when they hover.
    */
-  protected readonly isInDragSubtree = computed(() => {
+  protected readonly _isInDragSubtree = computed(() => {
     const src = this.drag.source();
     if (src === null || src.kind !== 'collapse') return false;
     let cur: BlockNode | CollapseNode | null = this.row().parent;
@@ -222,64 +222,64 @@ export class Row {
   });
 
   /** Drag is allowed when the host opted in AND this row isn't disabled. */
-  protected readonly isDraggable = computed(
-    () => this.drag.isEnabledFor(this.instance.prefix) && !this.isDisabled(),
+  protected readonly _isDraggable = computed(
+    () => this.drag.isEnabledFor(this.instance.prefix) && !this._isDisabled(),
   );
 
   /**
    * `true` when the host set `dragHandle: true` — Row renders a grip that
    * CDK uses as the sole drag-initiation target (`*cdkDragHandle`).
    */
-  protected readonly handleVisible = computed(
-    () => this.isDraggable() && this.drag.isHandleRequiredFor(this.instance.prefix),
+  protected readonly _handleVisible = computed(
+    () => this._isDraggable() && this.drag.isHandleRequiredFor(this.instance.prefix),
   );
 
-  protected readonly domId = computed(() => this.instance.domIdFor(this.row().id));
-  protected readonly level = computed(() => this.navigation.ariaLevel(this.row()));
-  protected readonly posInSet = computed(
+  protected readonly _domId = computed(() => this.instance.domIdFor(this.row().id));
+  protected readonly _level = computed(() => this.navigation.ariaLevel(this.row()));
+  protected readonly _posInSet = computed(
     () => this.navigation.ariaPosition(this.row())?.posInSet ?? null,
   );
-  protected readonly setSize = computed(
+  protected readonly _setSize = computed(
     () => this.navigation.ariaPosition(this.row())?.setSize ?? null,
   );
 
   /** Reactive accessor for an optional user template — null = default rendering. */
-  protected readonly customTemplate = computed(() => this.templates.template());
+  protected readonly _customTemplate = computed(() => this.templates.template());
 
   /** Context object handed to `ngTemplateOutlet` when a custom template runs. */
-  protected readonly templateContext = computed(() =>
+  protected readonly _templateContext = computed(() =>
     buildTemplateContext({
       node: this.row(),
-      depth: this.level(),
-      isSelected: () => this.isSelected(),
-      isChecked: () => this.checkedState(),
-      isDisabled: () => this.isDisabled(),
-      isActive: () => this.isActive(),
+      depth: this._level(),
+      isSelected: () => this._isSelected(),
+      isChecked: () => this._checkedState(),
+      isDisabled: () => this._isDisabled(),
+      isActive: () => this._isActive(),
     }),
   );
 
-  protected onClick(event: MouseEvent): void {
+  protected _onClick(event: MouseEvent): void {
     this.navigation.setActive(this.row());
     this.selection.handleClick(this.row(), event);
-    this.check.handleRowClick(this.row());
+    this._check.handleRowClick(this.row());
   }
 
-  protected onCheckClick(event: MouseEvent): void {
+  protected _onCheckClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.navigation.setActive(this.row());
-    this.check.toggle(this.row());
+    this._check.toggle(this.row());
   }
 
-  protected onDragStarted(event: CdkDragStart): void {
+  protected _onDragStarted(event: CdkDragStart): void {
     this.drag.beginDrag(this.row(), event.source.element.nativeElement, event.source);
   }
 
-  protected onDragMoved(event: CdkDragMove): void {
+  protected _onDragMoved(event: CdkDragMove): void {
     this.drag.trackPointerFromEvent(event.event);
   }
 
-  protected onDragEnded(event: CdkDragEnd): void {
+  protected _onDragEnded(event: CdkDragEnd): void {
     // CDK leaves the `translate3d(...)` it applied during drag on the source
     // element when there's no `cdkDropList` (drag-ref.ts:867 onward — it
     // converts active→passive transform instead of clearing). For our

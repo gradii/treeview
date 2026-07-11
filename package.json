@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "refactor:private-methods": "node tools/scripts/refactor-private-methods.mts"
+    "refactor:private-methods": "node tools/scripts/refactor-private-methods.mts",
+    "refactor:protected-members": "node tools/scripts/refactor-protected-members.mts"
   },
   "private": true,
   "dependencies": {
@@ -45,7 +46,10 @@
     "ng-packagr": "~21.2.0",
     "nx": "22.7.2",
     "postcss": "^8.4.5",
-    "prettier": "~3.6.2",
+    "prettier": "~3.9.5",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-packagejson": "^3.0.2",
+    "prettier-plugin-tailwindcss": "^0.7.4",
     "ts-morph": "^28.0.0",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",

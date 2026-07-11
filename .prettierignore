@@ -1,6 +1,14 @@
 # Add files here to ignore them from prettier formatting
 /dist
 /coverage
-/.nx/cache
-/.nx/workspace-data
 .angular
+.prettierignore
+.vercel
+/tmp
+/node_modules
+/stats.html
+pnpm-lock.yaml
+
+/.nx/cache
+
+/.nx/workspace-data

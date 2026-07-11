@@ -135,11 +135,11 @@ interface MoveLog {
   styleUrl: './demo-treeview-12.css',
 })
 export class DemoTreeview12 {
-  protected readonly teamA: Workspace[] = JSON.parse(JSON.stringify(TEAM_A));
-  protected readonly teamB: Workspace[] = JSON.parse(JSON.stringify(TEAM_B));
+  protected readonly _teamA: Workspace[] = JSON.parse(JSON.stringify(TEAM_A));
+  protected readonly _teamB: Workspace[] = JSON.parse(JSON.stringify(TEAM_B));
 
-  readonly leftRoot = computed(() => buildWorkspaceRoot(this.teamA, 'Team A'));
-  readonly rightRoot = computed(() => buildWorkspaceRoot(this.teamB, 'Team B'));
+  readonly leftRoot = computed(() => buildWorkspaceRoot(this._teamA, 'Team A'));
+  readonly rightRoot = computed(() => buildWorkspaceRoot(this._teamB, 'Team B'));
 
   readonly accessors = accessors as SourceAccessors<unknown, unknown>;
 

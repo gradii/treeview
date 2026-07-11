@@ -60,11 +60,11 @@ const accessors: SourceAccessors<Bucket, Card> = {
 })
 export class DemoTreeview11 {
   // Mutable source — both trees share these references; drops mutate them.
-  protected readonly backlog: Bucket = JSON.parse(JSON.stringify(BACKLOG));
-  protected readonly sprint: Bucket = JSON.parse(JSON.stringify(SPRINT));
+  protected readonly _backlog: Bucket = JSON.parse(JSON.stringify(BACKLOG));
+  protected readonly _sprint: Bucket = JSON.parse(JSON.stringify(SPRINT));
 
-  readonly leftRoot = computed(() => buildBucketRoot(this.backlog));
-  readonly rightRoot = computed(() => buildBucketRoot(this.sprint));
+  readonly leftRoot = computed(() => buildBucketRoot(this._backlog));
+  readonly rightRoot = computed(() => buildBucketRoot(this._sprint));
 
   readonly accessors = accessors as SourceAccessors<unknown, unknown>;
 

@@ -17,7 +17,7 @@ export interface NavigationControllerConfig {
  * Tree-walking keyboard navigation. Holds the active `NavigableNode` directly
  * and resolves moves (next/prev/parent/first-child/home/end) by descending the
  * tree from the current node — O(depth × siblings) per keypress, immune to
- * LoadMore / Block.ensureLoaded mutations.
+ * LoadMoreNode / `BlockNode.ensureLoaded` mutations.
  *
  * `activeNode` is the source of truth; `activeKey` is a derived view for
  * serialization and two-way bindings. External callers that only have a key

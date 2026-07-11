@@ -25,29 +25,29 @@ import { LoadMoreNode } from './tree-model';
   template: `
     <div
       class="tv-load-more"
-      [class.is-loading]="loadState() === 'loading'"
-      [class.has-error]="loadState() === 'error'"
-      [class.is-active]="isActive()"
-      [id]="domId()"
+      [class.is-loading]="_loadState() === 'loading'"
+      [class.has-error]="_loadState() === 'error'"
+      [class.is-active]="_isActive()"
+      [id]="_domId()"
       [style.height.px]="node().renderSize()"
       [style.--tv-depth]="depth()"
       role="button"
       tabindex="0"
-      [attr.aria-level]="level()"
-      [attr.aria-posinset]="posInSet()"
-      [attr.aria-setsize]="setSize()"
-      [attr.aria-busy]="loadState() === 'loading' ? true : null"
-      [attr.aria-disabled]="loadState() === 'loading' ? true : null"
-      (click)="onClick($event)"
-      (keydown)="onKey($event)"
+      [attr.aria-level]="_level()"
+      [attr.aria-posinset]="_posInSet()"
+      [attr.aria-setsize]="_setSize()"
+      [attr.aria-busy]="_loadState() === 'loading' ? true : null"
+      [attr.aria-disabled]="_loadState() === 'loading' ? true : null"
+      (click)="_onClick($event)"
+      (keydown)="_onKey($event)"
     >
-      @if (loadState() === 'loading') {
+      @if (_loadState() === 'loading') {
         <span class="spinner" aria-hidden="true"></span>
       } @else {
         <span class="icon" aria-hidden="true">+</span>
       }
-      <span class="label">{{ buttonText() }}</span>
-      @if (remainingLabel(); as r) {
+      <span class="label">{{ _buttonText() }}</span>
+      @if (_remainingLabel(); as r) {
         <span class="meta">{{ r }}</span>
       }
     </div>
@@ -153,22 +153,22 @@ export class LoadMore {
   private readonly navigation = inject(NavigationController);
   private readonly instance = inject(TreeViewInstance);
 
-  protected readonly loadState = computed(() => this.node().loadState());
+  protected readonly _loadState = computed(() => this.node().loadState());
 
-  protected readonly isActive = computed(() =>
+  protected readonly _isActive = computed(() =>
     this.navigation.isActive(this.node()),
   );
 
-  protected readonly domId = computed(() => this.instance.domIdFor(this.node().id));
-  protected readonly level = computed(() => this.navigation.ariaLevel(this.node()));
-  protected readonly posInSet = computed(
+  protected readonly _domId = computed(() => this.instance.domIdFor(this.node().id));
+  protected readonly _level = computed(() => this.navigation.ariaLevel(this.node()));
+  protected readonly _posInSet = computed(
     () => this.navigation.ariaPosition(this.node())?.posInSet ?? null,
   );
-  protected readonly setSize = computed(
+  protected readonly _setSize = computed(
     () => this.navigation.ariaPosition(this.node())?.setSize ?? null,
   );
 
-  protected readonly buttonText = computed<string>(() => {
+  protected readonly _buttonText = computed<string>(() => {
     const state = this.node().loadState();
     if (state === 'loading') return 'Loading…';
     if (state === 'error') return 'Failed — retry';
@@ -176,7 +176,7 @@ export class LoadMore {
   });
 
   /** Shows the remaining count when known; hidden when totalCount is infinite. */
-  protected readonly remainingLabel = computed<string | null>(() => {
+  protected readonly _remainingLabel = computed<string | null>(() => {
     const total = this.node().totalCount();
     if (!Number.isFinite(total)) return null;
     const remaining = Math.max(0, total - this.node().loadedCount());
@@ -184,7 +184,7 @@ export class LoadMore {
     return `${remaining} more`;
   });
 
-  protected onClick(event: MouseEvent): void {
+  protected _onClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.navigation.setActive(this.node());
@@ -192,7 +192,7 @@ export class LoadMore {
     this.node().load();
   }
 
-  protected onKey(event: KeyboardEvent): void {
+  protected _onKey(event: KeyboardEvent): void {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     event.stopPropagation();

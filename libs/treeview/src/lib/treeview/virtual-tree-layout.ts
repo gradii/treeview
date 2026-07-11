@@ -46,7 +46,7 @@ export function collectStickyAncestors(
     let next: CollapseNode | null = null;
     let cursor = offset + N;
     for (const child of cur.children()) {
-      // CollapseChild is now Block | Collapse — both expose `height()`.
+      // CollapseChild is now BlockNode | CollapseNode — both expose `height()`.
       const h = child.height();
       const childBot = cursor + h;
       if (

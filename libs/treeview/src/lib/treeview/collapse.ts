@@ -52,53 +52,53 @@ type VisibleChild =
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.top.px]': 'offset()',
-    '[style.height.px]': 'nodeHeight()',
+    '[style.height.px]': '_nodeHeight()',
   },
   template: `
-    @if (renderHeader()) {
+    @if (_renderHeader()) {
       <div
         class="tv-header"
-        [class.is-drag-source]="isDragSource()"
-        [class.is-in-drag-subtree]="isInDragSubtree()"
+        [class.is-drag-source]="_isDragSource()"
+        [class.is-in-drag-subtree]="_isInDragSubtree()"
         role="treeitem"
-        [id]="domId()"
-        [attr.aria-level]="level()"
+        [id]="_domId()"
+        [attr.aria-level]="_level()"
         [attr.aria-expanded]="!node().collapsed()"
-        [attr.aria-posinset]="posInSet()"
-        [attr.aria-setsize]="setSize()"
+        [attr.aria-posinset]="_posInSet()"
+        [attr.aria-setsize]="_setSize()"
         [class.collapsed]="node().collapsed()"
-        [class.is-selected]="isSelected()"
-        [class.is-active]="isActive()"
-        [class.is-disabled]="isDisabled()"
-        [attr.aria-selected]="ariaSelected()"
-        [attr.aria-disabled]="isDisabled() ? true : null"
+        [class.is-selected]="_isSelected()"
+        [class.is-active]="_isActive()"
+        [class.is-disabled]="_isDisabled()"
+        [attr.aria-selected]="_ariaSelected()"
+        [attr.aria-disabled]="_isDisabled() ? true : null"
         [style.top.px]="0"
         [style.height.px]="node().headerSize()"
         [style.--tv-depth]="node().depth()"
         cdkDrag
-        [cdkDragDisabled]="!isDraggable()"
-        (cdkDragStarted)="onDragStarted($event)"
-        (cdkDragMoved)="onDragMoved($event)"
-        (cdkDragEnded)="onDragEnded($event)"
-        (click)="onClick($event)"
+        [cdkDragDisabled]="!_isDraggable()"
+        (cdkDragStarted)="_onDragStarted($event)"
+        (cdkDragMoved)="_onDragMoved($event)"
+        (cdkDragEnded)="_onDragEnded($event)"
+        (click)="_onClick($event)"
       >
-        @if (handleVisible()) {
+        @if (_handleVisible()) {
           <span class="tv-drag-grip" cdkDragHandle aria-hidden="true">⠿</span>
         }
         <span class="caret" [class.is-expanded]="!node().collapsed()">▶</span>
-        @if (check.isEnabled()) {
+        @if (_check.isEnabled()) {
           <input
             type="checkbox"
             class="tv-check"
-            [checked]="checkedState() === 'checked'"
-            [indeterminate]="checkedState() === 'indeterminate'"
-            (click)="onCheckClick($event)"
+            [checked]="_checkedState() === 'checked'"
+            [indeterminate]="_checkedState() === 'indeterminate'"
+            (click)="_onCheckClick($event)"
           />
         }
-        @if (customTemplate(); as tpl) {
+        @if (_customTemplate(); as tpl) {
           <ng-container
             [ngTemplateOutlet]="tpl"
-            [ngTemplateOutletContext]="templateContext()"
+            [ngTemplateOutletContext]="_templateContext()"
           />
         } @else {
           <span class="label">{{ node().label() }}</span>
@@ -108,13 +108,13 @@ type VisibleChild =
     }
 
     @if (!node().collapsed()) {
-      @for (child of visibleChildren(); track child.key) {
+      @for (child of _visibleChildren(); track child.key) {
         @switch (child.kind) {
           @case ('collapse') {
             <app-collapse
               [node]="child.node"
               [offset]="child.top"
-              [absoluteOrigin]="absoluteTop()"
+              [absoluteOrigin]="_absoluteTop()"
               [viewportTop]="viewportTop()"
               [viewportBottom]="viewportBottom()"
               [stickyIds]="stickyIds()"
@@ -124,17 +124,17 @@ type VisibleChild =
             <app-block
               [block]="child.node"
               [offset]="child.top"
-              [absoluteOrigin]="absoluteTop()"
+              [absoluteOrigin]="_absoluteTop()"
               [viewportTop]="viewportTop()"
               [viewportBottom]="viewportBottom()"
-              [rowDepth]="childDepth()"
+              [rowDepth]="_childDepth()"
             />
           }
           @case ('loadmore') {
             <app-load-more
               [node]="child.node"
               [absoluteTop]="child.top"
-              [depth]="childDepth()"
+              [depth]="_childDepth()"
             />
           }
         }
@@ -294,30 +294,30 @@ export class Collapse {
   private readonly templates = inject(NodeTemplateRegistry);
   private readonly instance = inject(TreeViewInstance);
   private readonly drag = inject(TreeDragService);
-  protected readonly check = inject(CheckController);
+  protected readonly _check = inject(CheckController);
 
   /** Absolute canvas-Y of this collapse's top edge. */
-  protected readonly absoluteTop = computed(() => this.absoluteOrigin() + this.offset());
+  protected readonly _absoluteTop = computed(() => this.absoluteOrigin() + this.offset());
 
-  protected readonly nodeHeight = computed(() => this.node().height());
+  protected readonly _nodeHeight = computed(() => this.node().height());
 
   /** Visual depth handed to descendant Blocks / LoadMore for indentation. */
-  protected readonly childDepth = computed(() => this.node().depth() + 1);
+  protected readonly _childDepth = computed(() => this.node().depth() + 1);
 
-  protected readonly isSelected = computed(() =>
+  protected readonly _isSelected = computed(() =>
     this.selection.isSelected(this.node()),
   );
 
-  protected readonly isActive = computed(() =>
+  protected readonly _isActive = computed(() =>
     this.navigation.isActive(this.node()),
   );
 
-  protected readonly isDisabled = computed(() =>
+  protected readonly _isDisabled = computed(() =>
     this.disable.isDisabled(this.node()),
   );
 
   /** Source of an in-flight drag — dims the header while the user holds it. */
-  protected readonly isDragSource = computed(
+  protected readonly _isDragSource = computed(
     () => this.drag.source() === this.node(),
   );
 
@@ -327,7 +327,7 @@ export class Collapse {
    * rejects drops here; this signal lets the header paint as a non-target so
    * the user sees why nothing happens when they hover.
    */
-  protected readonly isInDragSubtree = computed(() => {
+  protected readonly _isInDragSubtree = computed(() => {
     const src = this.drag.source();
     if (src === null || src.kind !== 'collapse') return false;
     let cur: BlockNode | CollapseNode | null = this.node().parent;
@@ -343,50 +343,50 @@ export class Collapse {
    * this isn't the synthetic root (which has no parent — `moveCollapse`
    * can't relocate it, so initiating a drag would lead nowhere).
    */
-  protected readonly isDraggable = computed(
+  protected readonly _isDraggable = computed(
     () =>
       this.drag.isEnabledFor(this.instance.prefix) &&
-      !this.isDisabled() &&
+      !this._isDisabled() &&
       this.node().parent !== null,
   );
 
   /** Whether to render the explicit grip element (vs whole-header drag). */
-  protected readonly handleVisible = computed(
-    () => this.isDraggable() && this.drag.isHandleRequiredFor(this.instance.prefix),
+  protected readonly _handleVisible = computed(
+    () => this._isDraggable() && this.drag.isHandleRequiredFor(this.instance.prefix),
   );
 
-  protected readonly domId = computed(() => this.instance.domIdFor(this.node().id));
-  protected readonly level = computed(() => this.navigation.ariaLevel(this.node()));
-  protected readonly posInSet = computed(
+  protected readonly _domId = computed(() => this.instance.domIdFor(this.node().id));
+  protected readonly _level = computed(() => this.navigation.ariaLevel(this.node()));
+  protected readonly _posInSet = computed(
     () => this.navigation.ariaPosition(this.node())?.posInSet ?? null,
   );
-  protected readonly setSize = computed(
+  protected readonly _setSize = computed(
     () => this.navigation.ariaPosition(this.node())?.setSize ?? null,
   );
 
   /** Reactive accessor for an optional user template — null = default rendering. */
-  protected readonly customTemplate = computed(() => this.templates.template());
+  protected readonly _customTemplate = computed(() => this.templates.template());
 
   /** Context object handed to `ngTemplateOutlet` when a custom template runs. */
-  protected readonly templateContext = computed(() =>
+  protected readonly _templateContext = computed(() =>
     buildTemplateContext({
       node: this.node(),
-      depth: this.level(),
-      isSelected: () => this.isSelected(),
-      isChecked: () => this.checkedState(),
-      isDisabled: () => this.isDisabled(),
-      isActive: () => this.isActive(),
+      depth: this._level(),
+      isSelected: () => this._isSelected(),
+      isChecked: () => this._checkedState(),
+      isDisabled: () => this._isDisabled(),
+      isActive: () => this._isActive(),
     }),
   );
 
-  protected readonly checkedState = computed(() =>
-    this.check.getState(this.node()),
+  protected readonly _checkedState = computed(() =>
+    this._check.getState(this.node()),
   );
 
   /** `aria-selected` is omitted entirely when selection is disabled. */
-  protected readonly ariaSelected = computed(() => {
+  protected readonly _ariaSelected = computed(() => {
     if (!this.selection.isEnabled()) return null;
-    return this.isSelected();
+    return this._isSelected();
   });
 
   /**
@@ -394,10 +394,10 @@ export class Collapse {
    * the overlay layer will paint it. Skip when filtered-out (visible=false).
    * Otherwise emit only if the header intersects the effective viewport.
    */
-  protected readonly renderHeader = computed(() => {
+  protected readonly _renderHeader = computed(() => {
     if ((this.node().invisible() & HIDE_SELF_MASK) !== 0) return false;
     if (this.stickyIds().has(this.node().id)) return false;
-    const absTop = this.absoluteTop();
+    const absTop = this._absoluteTop();
     const absBot = absTop + this.node().headerSize();
     return absBot > this.viewportTop() && absTop < this.viewportBottom();
   });
@@ -406,11 +406,11 @@ export class Collapse {
    * Children whose absolute range intersects the viewport, with `top` values
    * relative to this collapse's content area (i.e. starting after the header).
    */
-  protected readonly visibleChildren = computed<VisibleChild[]>(() => {
+  protected readonly _visibleChildren = computed<VisibleChild[]>(() => {
     const results: VisibleChild[] = [];
     if ((this.node().invisible() & HIDE_SELF_MASK) !== 0 || this.node().collapsed()) return results;
     const headerH = this.node().headerSize();
-    const contentAbsTop = this.absoluteTop() + headerH;
+    const contentAbsTop = this._absoluteTop() + headerH;
     const vt = this.viewportTop();
     const vb = this.viewportBottom();
     let cursor = 0;
@@ -444,35 +444,35 @@ export class Collapse {
    * clicks (ctrl/cmd/shift) drive selection only — toggling during a range
    * select would be jarring.
    */
-  protected onClick(event: MouseEvent): void {
+  protected _onClick(event: MouseEvent): void {
     const hasModifier = event.ctrlKey || event.metaKey || event.shiftKey;
     if (!hasModifier) this.expand.toggle(this.node());
     this.navigation.setActive(this.node());
     this.selection.handleClick(this.node(), event);
-    this.check.handleRowClick(this.node());
+    this._check.handleRowClick(this.node());
   }
 
-  protected onCheckClick(event: MouseEvent): void {
+  protected _onCheckClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.navigation.setActive(this.node());
-    this.check.toggle(this.node());
+    this._check.toggle(this.node());
   }
 
-  protected onDragStarted(event: CdkDragStart): void {
+  protected _onDragStarted(event: CdkDragStart): void {
     this.drag.beginDrag(this.node(), event.source.element.nativeElement, event.source);
   }
 
-  protected onDragMoved(event: CdkDragMove): void {
+  protected _onDragMoved(event: CdkDragMove): void {
     this.drag.trackPointerFromEvent(event.event);
   }
 
-  protected onDragEnded(event: CdkDragEnd): void {
+  protected _onDragEnded(event: CdkDragEnd): void {
     event.source.reset();
     this.drag.commitAndEnd();
   }
 
-  protected toggle(): void {
+  protected _toggle(): void {
     this.expand.toggle(this.node());
   }
 }
